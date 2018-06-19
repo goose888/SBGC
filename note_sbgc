@@ -1,0 +1,215 @@
+Bug:
+(1) strange diffs between two same cases:
+diff in air temp, precip, lw down and specific q
+Okay, now adjusted the met files so both are using the same atm forcing
+(2) Strange diffs of ALT between two same cases:
+Now checking if the moss insulation has impacted the calculated results?
+It seems like the representation of moss layer may impact a lot both the D14C profile and ALT. Do we have to explicitly model the moss layer?
+
+Part 1: model developemnt
+
+ALT problem:
+We started checking if model can capture the active layer thickness, which shall be the first step in order to represent the modeled SOC profile. See if other's papers (Chadburn et al., 2015) have studied the ALT from the models?
+After we checking the site 143, we found the active layer thickness is failed to be captured by the model, which used to be captured by the older version of the model due to a bug in calculating the soil moisture when activating Yang's macro-pore scheme. Since this scheme largely modified the soil porosity thus creating a very large SMP gradient and destabilize the numerical solution of SWC to be negative. In addtion, plant's modification on soil porosity seems not to be an important case happening in the northern high-latitude region, I chose to shut down this scheme.
+Though we added a simple moss insulation representation into the model (3 layers, around 10cm), ALT for site 143 still fail to be represented well. Observation from CALM site suggested an ALT close to 50cm but we calculate an ALT around 1.5m for the older version of the model. The newer version of the model even calculated a 3.8m for several years. 
+Based on these cluses, I guess the SOIL DEPTH in the model may not be represented in the model successfully, thus effect the water storage and also the permafrost table. Would be good to check if this matters for the current model?
+Another possible reason is the local effects, such as the UPPER/LOWER LAND impact. Mostly the moist soil may have a higher thermal conductivity comparing to the dry soil, hence a thinner active layer can mostly be found in upper land sites comparing to the lower land sites. A critical calibration to match the site observed active layer thickness may really need to resolve the soil water content.
+Third reason, actually a doubt. Why the model seems to be so sensitive to the CLIMATE FORCINGS? I did not plot the diffs between two climate forcing this time, but will deserve to check the differences on the climate forcing.
+Fourth doubt is about if coupling the SOM storage together with the thermal insulation, i.e., using the fully coupled BGP and BGC as suggested by Koven et al., 2009, can alleviate this problem? My previous study suggest an obstacle to implement this scheme: by start running the model with zero SOC insulation impact, the temperature of the top soil is higher comparing to the case that prescribing an initial SOC profile. Since we only can trigger the SOM to start accumulating once the active layer exists, but the high temperature prohibit the existence of a relative shallower ALT, hence we will seldom be able to trigger the SOC accumulation in the top soil. In addition, due to the high temperature we will overestimate the soil respiration and decomposition which makes the accumulation of SOC to be harder. As a consequence, the SOM cannot be accumulated and the SOM insulation impact cannot be builtup hence lead to a failure to capture both the impact. Hence in my point of view, a prescribed SOC stock to provide a first guess of the amount of SOC residing in the soil is necessary. But in Charlie's 2009 GRL paper he indicated that he directly use the prognostic SOC to drive the model. Not sure how Charlie did this.
+Seems like the ALT is really sensitive to all kinds of different meteorological forcings? Hypothesize that sw downward, lw downward and air temperature may really impact the results?
+How to test?
+One suggestion is that we shall not use a long climate time series for model spinup.
+Actually the sensitivity is also related to the depth of the soil...
+Why ALT is settled so slow?? There seems to have some issues related to the SWC or the ground temperature? Even with dynamic vegetation shall not give this issue.
+[Is this true? Something else is happening in the code...] Okay, seems like the new set of the climate data is warmer comparing to the previous estimation and the active layer thickness is very sensitive to the climate since a positive feedback enhances the thermal penetration of the energy received from aboveground: 1. warmer climate cause more ice melting down to form soil water and 2. higher soil water content increase the thermal conductivity thus enhance the thermal penetration. Seems like the sensitivity of permafrost is really sensitive to the climate.
+Now this problem became an issue related to the supercooled water, which keep increasing residing in the frozen layer above the permafrost when spinup the model. Seems like the ALT is not a big issue in the uppser soil layers, but still doubt if the stable soil thermal status will be affected by this supercooled water scheme? Is this scheme too simple? (Need to check later, but have other priorities.)
+Check if SOC has been described correctly to capture the ALT.  <The SOM profile does not match what we expect from the model output, hence by activating the dynamic SOM, the ALT becomes smaller than the decoupled version. But a question right now is that what SOM profile shall we use to initialize the model? Can we start the simulation from zero and let the model accumulate the SOC and at the same time build up the active layer thickness? Second, if this approach is reasonable?> 
+Check soil depth is correct or not?  <10 layers, seems good. But it would be good to have some mesurements to illustrate. Seems like the measured "soil depth" seems even deeper than we expect. So don't want to change the soil depth at least for now.>
+Check how the drainage can impact the active layer thickness? <The impact is very limited. Seems like the thermal conductivity must be extremely low in order to capture the observed active layer thickness? So we keep the previous drainage scheme at least for now.>
+Check the possible alternative climate forcing? It is even harder since we cannot obtain a reasonable forcing. 
+Why check back the data? Let's see if after we implementing the observed SOC things may change or not?
+Now after reading the paper about the GIPL model, seems like CLM has not considered coupling thermal dynamics with phase change, which may cause issue in the norther latitude region. But a coupled equation may have to perform iterative calculation in order to find the solution that is highly computationally inefficient. So right now we do not change any code, but keep in mind that this could cause issues when simulating the ALT.
+Now the thing has changed after we added a moss layer up to 36cm. The ALT is now close to 50cm, which is close to the observation. Though we may have to wait and see if this ALT can provide a reasonable SOC profile estimation or not...
+Based on the GIPL model's work the deep ALT is less possible being caused by climate forcing since GIPL also used output from GCM but reproduced the ALT matches the observation pretty well. Hence it is most likely that we have not captured the low conductivity of soil. Since the site is observed as a wet black spruce site with underliying rich organic carbon, most of the soil thermal property has largely been modified by organic carbon, hence the soil texture may not be the reason that we failed to capture the shallow ALT. Though SOM palys an important role for the failure to capture the thermal dynamics, the thickness of the moss layer is the most likely reason. Though a 6 layers moss maybe too deep for our case, we need to check some evidence that can allow us to apply such a thick moss layer.
+Local data shows a soil depth up to 25cm is covered by the moss in this site (O’Donnell, J.A., Harden, J.W., Manies, K.L., Jorgenson, M.T., Kanevskiy, M.Z., and Xu, Xiaomei, 2013, Soil data from fire and permafrost-thaw chronosequences in upland Picea mariana stands near Hess Creek and Tok, interior Alaska: U.S. Geological Survey Open-File Report 2013–1045, 16 p.) Hence ww will use 6 layers of moss for this particular site.
+Shall think about if some moss cover data can be utilized when performing the global scale simulation? This shall include depth and abundance?
+
+D14C profile porblem:
+Now the next step is to see if the estimated SOC profile and D14C matches the sample?
+Seems like that the results improved a little bit. But now if we need to think about it more carefully in order to get a better representation or not?
+(Frozen Q10, moisture modifier, the reason we require a small diffusivie rate representing background movement (we tested a range of different background diffusive rate and found 10% of Koven's value to be the best for fitting the D14C profiles)?)
+For the D14C profile, seems like a slight change of diffusive rate or advective rate does not change much of the profile. A similar conclusion as Koven et al. 2013.
+So now I'm testing if we would return to the diffusion scheme I applied for the AGU 2015's talk anything will be changed or not? (Testing on Site 143)
+Now let's look at more sites.
+Several issues I have targeted:
+(1) Site 146 accumulated too high SOC stock. Need to figure out the reason later.
+A: Seems like the extremely high SOC vertical mixing rate appears to be one of the important factors for the high SOC stoick accumulation. Need to finish the run and see how it is going to impact?
+Yes, we proved that the high advective rate causing large amount of carbon to be transported and preserved from deomposition in the deeper soil. Now we need to check how big is the advective rate becoming?
+Seems like in this case model has estimated a too high hydraulic conductivity thus overestimated the frost heave rate. One more constraint and other several modifications have been made in the code to acheive a more reasonable frost heave scheme.
+Now we decided rerun all the sites using the revised frost heave scheme.
+(2) Site 43 accumulated too low SOC stock. One possible reason is that model estimated too high ALT that cryoturbation has been halted as a result of hampering cryoturbation to happen. Since the background bioturbation shall happen everywhere and Koven et al., 2013 already showed the possible outcome of the globally universal bioturbation will not cause extremely anomalous SOC stock in most of the non-permafrost region. Thus I feel this condition to be unnecessary and I have to think about if anything else (e.g., strange O2 limitation, stringent depth modifier and mismatch of litter input profile against root mass fraction profile) triggered the extra high accumulation of the SOC in the non-permafrost region. Thus, even ALT in this site is too high, the accumulated SOC stock shall still be higher than 15 kgC/m2 due to the low decomposition. Hence, such a question need to be carefully think about.
+Also, it seems like the extremely high SOC accumulation from site 146 is related to this issue. How can I figure this out?
+A: Seems like I have misused PFT 9 for this site. It did not grow properly. But also need to check if PFT 5 can survive in this site or not?
+Okay, seems like PFT 5 does not have any issue there.
+(3) Site 155 also accumulated a large portion of the SOC in the deepest soil layer, which does not match the soil profile we generated for the AGU 2016. Probably too low the temperature causing relatively slow decomposition?
+A: Problem is fixed after changing the frost heave scheme.
+(4) Seems like site 154 also has too little carbon stock estimated from the model, anything was missed?
+A: Because site 154 is a shrub site. Now we found an issue that shrub or tundra site has too low SOC stock comparing to the previous estimation. Need to check papers and see if this is normal or not? (Not fixed yet)
+(5) Site 110 also produced too low carbon storage?
+A: 110 is a tundra site. It should be the same problem as site 154. Need to check the paper and see what exactly happened and fix this issue once getting more data for referecen.
+(6) Another issue we need to discuss is the convergence of the SOC storage by the end of the simulation of ISAM-1DSBGC.
+
+After doing the recalibration: RESULTS FOR THE FIRST CALIBRATION:
+Two Donnelly sites look good to me. D14C of Donnelly flat increase along the depth in the top soil.
+Gydansky site looks good to me.
+We found the D14C profile does not always start from the decomposed litter but some start from as moss and slightly decomposed litter. How can we treat such a horizon with an increased D14C?
+I have neglected the importance of root profile... Should check if the root profile was working fine or not?
+Checked the vertical distribution of root litterfall. It is fine.
+Rooting depth is treated correctly in the model, now we need to have some further analysis?
+Litter fall, rooting depth, active layer thickness, seasonal cycle (shall we check the seasonal pattern? I doubt that. vertical cryoturbation rate?
+Let's step back. So as the observations showing root litter to be enriched by 14C (D14C data shows a almost 200 value for the Fibrous organic horizon, means only fresh new organic carbon with fast turnover residing here...) even comparing to the aboveground live moss, which is not that reasonable. This point shall be checked carefully through the papers and field data.
+Done, seems like only the slightly decomposed litter residing here. But in our model I saw large portion of stabilized humified SOC component in the top layer, this is not valid since a large portion of OC is only slightly decomposed, even in the well-drained soil. What kind of method shall I apply to resolve this problem? Is this mainly because we implemented too weak the O2 limitation?
+
+Need to think carefully about how we could apply the O2 limitation smartly!
+1) Explicitly add additional litter layer? 2) Add new O horizon which have different vertical transport speed? 3) Add litter onto the ground to accumulate and form new litter layer (like Yi et al., 2009)? 
+I believe case 2) could be the best strategy within these 3 choices for the current generation LSMs. But before doing this we need support from other publications. Check if any paper on cryoturbation or soil organic layer modeling support this idea?
+I think it will be better to have a literature review before making this decision... [HAVE NOT DONE THIS!!! NEED TO DO IT LATER!!!]
+I believe such a representation is supported by Yi et al., 2009 (variable depth of litter layer) and Brakkelake et al., 2013 (fixed depth of 3 litter layers which does not move downward but only transport between each two layers). So now I shall try to modify this (reduce the vertical movement of litter poor but keep the soil pool to be transported downward. Shall be interesting to see if any optimization algorithm can be applied into the model to calibrate these parameters?)
+Okay, I tested the scheme by only transporting the SOC pools but set the vertical rate of litter pools to 0. This does not seem to resolve such an issue. Looks like I largely underestimated the top layer vertical transportation. Now I would really think about increasing the vertical mixing rate for the top layers (probably use the uniform vertical transport rate) and also fix the litter pool with no vertical transportation?
+Okay, I shall test this.
+Now I figured out another possible issue related to the litter layer above the ground. Such a thick organic horizon may indicate a different turnover rate comparing to the previously calibrated values. D14C data shows a almost 200 value for the Fibrous organic horizon, means only fresh new organic carbon with fast turnover residing here... 
+
+# Break of the work because of methane work for AGU2017. #
+
+Now return from my AGU works on methane. Restart the SBGC work.
+Here comes two key questions:
+1) How the D14C data can indicate the fate of SOC? Need to check some classics from Sue Trumbore?
+The sensitivity analysis from previous studies all suggest a small sensitivity when changing the diffusive rate. The main shape of the D14C is highly related to the rooting depth. However the high spike D14C of the upper organic layer seems to be hard to simulate, as suggested by Riley et al., 2014. The main reason they suggested is the aggreation that protect the SOM to be decomposed. It is a delimma that we cannot capture the corresponding D14C for the top soil, any other possible reasons?
+
+Need to check the rooting depth for the Hess creek site carefully.
+Some sites have high upper level D14C. Really want to examine the actual reason?
+From Charlie's paper I saw some other sites outside the NHL region has relatively low peak of the D14C. What kind of discrepancy exist among these sites. I'm guessing the low temperature has relative strong effect that may suppress the decomposition, but I doubt this to be enough to explain the very high D14C in the top organic layer.
+Any method we can use simple model to reverse calculate the age of the SOM? With considering both the decomposition and the natural decay of radiocarbon?
+
+An idea of extreme experiment: what would be the profile if I suppress the decomposition of the very top soil layers?
+[Interestingly, I have not found any interesting improvement to get a better estimation for the D14C in top SOM. Seems like the issue is related to the input?? Some assumptions may need extra treatment.]
+
+[Solved] 1. Is the D14C of input high enough? 
+Yes, at least for this test site it is high enough (500 for leaf, 300 for fine roots, 200 for coarse roots and 50 for woody debris).
+
+[Partially solved] 2. Is the turnover from the top soil high enough hence the incease of the D14C after bomb test can be reflected in the top soil?
+How can we evaluate this problem? Print and see the SOC and D14C profiles of every pool?
+I guess the relative large stabilized humified soil in the top soil is the main issue causing the relative low D14C. Need to see the Barrascka's paper and check how he calibrate his vertically resolved SOM model?
+Why not testing by myself? I shall test several sites and see the difference?
+Okay, I checked several sites. This is really where the problem is!
+Now return back to the SOM model itself, how these SOM pools has been defined in the ISAM? Can we think about the way treating these pools differently and assign the different vertical movement speed? Also, let's see what it may change when changing the vertical diffusion rate?
+Johan Six's review paper suggested the difficulties to simulate the measurable SOM pools using the CENTURY based model scheme. He suggested a mechanistically based SOM fractionation scheme. But the mechanism of C saturation level and this design of the SOM pools he presented have not been tested.
+Another question would be what kind of sensitivity of the estimated D14C profile to different processes? Not only the change of the diffusive rate and advective rate, but the change of depth modifier, temperature modifier and moisture modifier? I think I can perform one experiment to check such an issue?
+This has been tested and I cannot see obvious improvement.
+However, I found huge humified SOC accumulated at the top soil. This is not possible and this large old SOC pool limited the model to capture the new SOM found in the top soil. So how can we model the surface organic layer? We want both the thermal insulation impact (in order to capture the ALT) and the relative slow decomposition of coarse litter (is proved by the high D14C value) to be represented here! 
+Okay, I have noticed the difficulty for simulating the organic layer through applying Charlie's scheme. Without representing the soil organic layer one can hardly simulate the 14C correctly seems like. Let me work on some literature review to see if there can have some global distribution of soil organic layer thickness available for a global model?
+Today I'm going to review several papers related to this topic.
+D14C data from Rothamsted site seems to be pretty old. Most of the top soil layer for old grassland sites still have nagative values. Woodland sites show the positive values but only less than 50. However, since the top soil is a soil bulk with a depth from 0 - 23cm, the radiocarbon age can be older comparing to the very shallow top organic layer. Hence the formation of the organic layer shall be deployed in the vertically resolved SOM model in order to get the radiocarbon age correct.
+Okay, I'm thinking about combining the vertical diffusion (Jenkinson and Coleman, 2008) and SOM accumulation (Yan et al., 2009) together. I would see if such a full consideration can improve the simulated top soil organic carbon?
+How shall I go for it? 
+To improve the result, the main purpose is to reduce the percentage of the humus in the top organic horizon, but how shall I seperate them layer by layer?
+One of the diffuculty now is getting a better representation of the bulk density for the surface layers. Since the bulk density can be one of the constraint on the carbon amount residing in one layer.
+Now I thought about an approch to nudge newly formed SOM downward and accumulate the soil organic horizon. This method is able to reduce the total carbon amount in the top layer, but cannot reduce the proportion of labile SOM in the top soil layer. Need to think about another approach. Need to carefully check Barrascka's paper!
+After reading the paper, I found the separated horizon to be harder to represent in a global scale. And I have seen the improvement after incorporating the constraint from the bulk density value. Hence I'm thinking to use the bulk density data for constraining the thickness of the soil organic horizon being modeled. It is tricky to calculate the bulk density since the pools are not defined based on actual composition.
+[X] Interpolate the bulk density profile.
+[X] Use the new bulk density values in the ISAM to constrain the SOC in each layer.
+[X] Check the results of the model simulation.
+We now have seens some improvements after implementing the bulk density to implicitly represent the accumulation of organic carbon in the top layer. But some strange results may occur:
+(1) For a given site if the bulk density between two layers have extremely large differences (org vs. mineral), the SOC profile will become strange (e.g., 45). Two possible reasons:
+   1. Is it possible that we have underestimated the vertical transportation (e.g. bioturbation) of the SOC?  Hence the SOC vertical transportation has been limited and the SOC accumulate in the first mineral layer where the BD is relatively high.
+   2. Since the layer depth is not eqaully defined, we cannot ignore the possiblily that a single BD may not be adequate to represent the whole layer. 
+   3. Also, BD for the mineral layers may not be available in He's data. Hence we need to be cautious to use these datasets.
+(2) The improvement, though can be seen, is still small in several sites: 47, 198, 199. Need to check purturb uncertain parameters to test the model now!
+** These issues make me feel like modeling the SOC vertical transport in a finer resolution!
+
+[Solved] 3) Another issue is that when reading the site data generated by extracting the CRUNCEP data, the simulated results are different from the simulation using the global CRUNCEP dataset. Why?
+Seems strange to me. Now it shows no issue when changing different climate forcings. Maybe the D14C data being used in these two versions of the models are different?
+
+
+Part 2: Calibration and testing of the model behavior:
+Previous works have already been done to figure out the sensitivity of key variables. Most of the works attribute the advective rate, the depth modifier and the distribution of rooting depth as the most sensitive parameters. However, since we used a different parameterization for calculating cryoturbation and considered the accumulation of organic horizon, we here proposed to perform the sensitivity test for all the key uncertain parameters in ISAM 1DBGC.
+By varying the uncertain parameters, what will be the most important one controling the ISAM estimated SOC stock and D14C profile.
+All the parameters being examined include: D, tao (i.e., v), BD, depth modifier.
+Here lists several personal guesses:
+1. Bulk density strongly constrain the D14C of the model since now the bulk density is used to calculate the limitation of organic matter accumulate at each layer. This effect will be especially strong for soil profile with thick organic layer.
+2. Bioturbation does not effect the D14C profile a lot. Most of the studies agree with this conclusion.
+3. Tao may be an important parameter. Since different modeling works represent the advective motion differently, I cannot take reference from other previous works.
+4. Depth modifier is important for controlling the subsoil D14C profile.
+5. Really need to constrain the rooting depth correctly. Even we cannot get the actual measurement, we need to judge the output from our model based on previous published datasets.
+6. Other than the bulk density, resistency of the resistant litter pool will largely contribute the D14C of the high value where changing the BD could not fix. This is a point we need to check with?
+7. Lower boundary of the vertical transportation.
+What calibration strategy would I use to quantify the parameters for the model?
+At first, we still want to purturb the parameters and check the behavior of the model. We shall prepare several parallel experiments for testing the sensitivity.
+
+[X] Also I would like to figure out what kind of method shall be used to derive the one pool turnover based on the D14C observation.
+I checked He's code and found the equation she used is to calculate the turnover time under equilibrium. So we need to bear in mind this point.
+
+Several misc stuffs need to be done before the purturbation:
+(1) Should know the solution to check if there has a large difference of BD causing very strange simulated SOC profile. How to resolve this issue?
+I have no idea till now...
+Would it be good to add an adjustment parameter for correcting the discontinuity of BD across the organic-mineral interface? Or another approach is to think about accelerating the bioturbation rate.
+[X] (2) Shall be able to adjust the overestimation of D14C for site 143.
+I feel this can be related to the parameter perturbation works. Shall be good to implement the code first then examine under what condition can we match the observed D14C.
+Also, in this case we have multiple parameters which we may face the equifinality problem. Here I hypothesize the different uncertain parameters contribute to the D14C differently. Hence we still can figure out a most possible set of the parameters by checking the diff between modeled and observed D14C as the cost function.
+[A] Only small improvement can be brought after switching the parameters from low to high values. Now I shall be seriously think about setting a lower bound that SOC cannot be brought downward any more. Also, the extremely old SOC at site 143 seems to be hard to simulate but will be good to examine if we change this strategy can help?
+Another parameter which I have not set yet is the rooting depth!
+Okay, let's see if reducing the rooting depth can alleviate this issue drastically!
+Nope. It moved your D14C profile to the left but cannot reproduce Site 143 for some reason. Seems like the only way we can do is to stop the vertical transportation of SOC into the deep layer. Now let's see if we reduce the vertical transportation of SOC to an extremely small value would help or not?
+Seems to be helpful now. We shall setup another uncertain parameter determining the lower boudary for the vertical transportation to be halted.
+Okay. The only way to match this profile is to halt the vertical transportation at a specific depth. Rooting depth may not able to help too much when comparing to the constraint from the lower bound of transportation.
+
+(3) The D14C of the Frost upper black spruce 6 site is too high, especially at the organic layer. Even from He's code we only estimate the turnover of the soil to be close to zero. Something seems to be strange there.
+Oh, I forgot to check the SOC profile besides D14C. Shall be really important to check both of them. However, my guess is that the SOC is not the main reason that model cannot capture such an observation. This kind of observation is really strange to me.
+
+About calibration, now I shall check Xiaojuan's code and see if this can help. [This shall be the first priority then.]
+In Xiaojuan's FFSQP code, several things I need to figure out are:
+1) How the model change the parameter. It is based on what kind of criteria? [Seems like we only need to provide the initial guess and the corresponding upper/lower bounds of all parameters in main.f90!]
+2) How can we decide the objective function? What criteria they used to stop the optimization? [They have given *some* criteria for minimizing the annual C and N content of LIDET observation. We use the same objectiv function but only use a single SOC and D14C observation from the soil profile.]
+The obj function is defined as the direct differences between the observed and simulated remaining C, N content from the LIDET observation. Now what I applied is that the total dqure of the difference is smaller than 1e5 for D14C profile and the SOC stock if smaller than 5 for the accumulated SOC profile, which is a relative weak constraint but is enough for our research since the fit to the observed D14C profile is difficult and easily to be overparameterized if the observed soil depth is not the same as the model's depth. Hence, a weak constraint is necessary for the calibration of ISAM. Also, the trail and error approach for assisting to prevent falling into local minima is also needed. We need to think about how we can resolve the equifinality problem and the issue related to the requirement of the long simulation time for building up SOC stock?
+
+What if we remove the depth modifier? Nope, we don't expect to consider no organo-mineral interactions.
+Need to test the sensitivity for every site!
+
+
+Now I have applied the FFSQP from Xiaojuan and did the optimization (though in a pretty awkward way...).
+
+Next five important things:
+1) [Data processing and coding] Check Mishra SOC data now and see how use this model to calculate the tau, and what the parameters we shall use?
+2) [Reading and writing] Shall read the method calculating tau from D14C and then write into the draft!
+
+[X] 3) [Data processing and writing] Shall choose the reasonable Mishra's data profiles and write into the draft. Need to say what is the permafrost mask we used for extracting the data.
+We pciked all soil profiles within the permafrost mask (From NSIDC) to examine the model performance. All the SOC profiles from these locations have been interpolated to the soil depth as used in ISAM.
+Now for the simulation I would copy these sites to Edison first then simulate all profiles together!
+
+[X] 4) [Modeling, reading and writing] Check the calibration progress and understand these parameters by comparing to the information from the SOC sites. See how other paper has written the calibration part and put into the draft.
+
+5) [Reading and writing] Check the importance of the litter input, rooting depth and other factors ISAM did not consider in this version. Shall take references from Kath Todd_Brown's old paper, Mishra's paper, Koven's paper, Riley's paper and Burke's paper and another review paper by?
+
+Can we use the available soil texture data from U Mishara's data and force ISAM-1DSBGC?
+Have I already done it??
+
+Perched water table is actiavated in the SBGC version but need to be reconsidered in the methane model. After activating it methane model compute high CH4 emission in East Siberian where the perched water table depth is always above 30cm.
+
+Done!
+Site okay:
+110
+
+Site calibration wrong: (done)
+143 [Damn, I used a wrong starting c14 level for site 143. Need to rerun...]
+
+Site sensitivity wrong:
+43, 146, 197
+
+Five things need to be updated in this first version of the draft:
+1) Sites being used are not the same as what we have plotted. Update the figure 2.
+2) The turnover time for the ISAM-1DSBGC does not consider the soil depth from 0.81 to 1m (which is a portion of the layer 8), so we need to update figure 4 also.
+3) The turnover time for the ISAM-0D cases are calculated from incorrect simulations, which shall be re-calculate and substitute in the draft.
+4) The turnover time we collected from the paper lacks the description of the methodology, hence we must add enough description of its methodlogy. Also, more turnover time from literature would be great to incoporate into this comparison, although I can hardly find more...
+5) A figure showing turnover time against T,W is what I strongly want to look at. So I shall check this also.
+
+

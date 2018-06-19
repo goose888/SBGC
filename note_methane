@@ -1,0 +1,217 @@
+====================== Start checking the calculated CH4 from ISAM. ====================
+
+The imbalance issue is needed to be fixed asap.
+Now we first summarize what we have done in the ISAM CH4 module:
+!---------------------------------------------------------------------------
+! Description: Main subroutine for O2/CH4 transport, CH4 production, 
+!              CH4 flux and oxygen limitation on SOC decomposition
+!---------------------------------------------------------------------------
+! Shijie: This subroutine will be called every time step after BGP
+!         Calculation sequences:
+!         ====> Receive and process inputs from isam_comp.F90
+!           Do iteration using the timestep defined by user
+!              ====> methane production (PMP method)
+!              ====> methane oxidation (M-M method)
+!              ====> methane ebullition (Following Wania et al., 2010)
+!              ====> arrange source/sink terms of diffusion equation (NEED TO CHECK CAREFULLY)
+!              ====> oxygen diffusion 
+!              ====> methane diffusion (with adding production, oxidation
+!              and ebullition as sources)
+!              I DOUBT THE TREATMENT OF DISSOLUTION AND THE TRANSPORT THROUGH WATER MAKES SENSE
+!              IN THIS MODULE
+!              ====> calculate methane fluxes
+!              ====> get oxygen modifier for refraining aerobic C mineralization
+!           End of the do loop
+!         ====> End, only : OXYGEN, METHANE
+!
+!---------------------------------------------------------------------------
+
+Now first let's check carefully about the diffusion scheme.
+
+(Suggestion? We can compare against the hydrology treatment if possible?)
+One interesting question I have not checked yet is, can diffsion equation conserve the mass?
+Oh, yes. Diffusion equation is derived from Fick's law + continuity equation. So we have no reason
+to doubt the mass conservation of the equation. I already checked this and probably forgot it...
+
+Now let's check step by step, first to look if diffusion code itself create large imbalance?
+Seems like the difference is not small... 
+
+Another issue is that if the DZ_cal we used contained the weight from the fraction of air filled porosity?
+I see. We have not considered the effect of air filled porosity. So what shall be the correct way to represent this?
+Let's first check from the LPJ_Whyme implementation?
+
+I saw the relative error in a scale of e-4 cannot be avoided using currently our scheme. But why LPJ-Whyme only has a relative error at the scale of e-6?
+Check the balance by copying the code outside the module?
+
+I see we have a good diffusion calculation scheme since I tested outside ISAM the corresponding portion of the code. But the imbalance is large after putting the code part into ISAM. What caused this issue?
+I did not see any differences or improvements after changing the dt and D for both good case (the case with mass conservation) and bad case (ISAM). Hence there must have other stuff causing this serious issue.
+Should we check the tri-diagonal code? Let's go and have a look! Okay, they are the same.
+What could be the problem right now? shall we close all the other part of the calculation?
+Possible guess is the fluctuation of the gas concentration in the second level. Because the dz in the shallow layers are so small and the reaction to diffusion flux ratio is large, hence a separated calculation of gas consumption without considering as a source/sink to the diffusion scheme can cause issues.
+Since we're only examing the diffusion calculation right now, we shall try comment out all O2 consumptions outside the diffusion scheme and check the balance right now!
+Okay, I see the issue is still about the treatment of the dissolution process. Before we can add the reaction source/sink terms, we shall think about a way to make this up. How we can include the ch4 fluxes and dissolution into the diffusion scheme?
+It seems like we also need to force the first layer being a constant that may maintain the mass conservation.
+
+Done the checking of the diffusion scheme for case 1. How about the case 2 (I expect this to be even easier than case 1)?
+
+I reviewed the CH4 module from CLM. Seems like CLM code considered the diffusion and the balanced dissolution between unsaturated and saturated layer. But it may not be true if we ignore the ch4 concentration inside the water in unsaturated zone. I assume the methanotroph consume oxygen from the aqueous form instead of directly consuming the gaseous CH4. In addtion, there has several differences between CLM and the current diffusion scheme we're using.
+1) Considered the depth weighted diffusion rate. I shall carefully check if this will matter the mass conservation of the diffusion scheme.
+2) No special treatment of the 2 times the concentation on both sides of the equation for the bottom layer. [But seems like this will not affect too much since the bottom layer seldom has large methane content.]
+3) source/sinks terms are included in the RHS of the equation.
+4) Seems like the oxygen and methane are treated differently. I shall examine if the diffusion calculation is different in the two cases.
+Did not find other differences right now. Need to check once tested the CLM scheme.
+I shall copy the code and test it separately.
+
+Okay, I have tested the CLM CH4 module and find out the diffusion scheme in all three models have quite similar behavior thus no extra effort is required to debugging the diffusion scheme any more.
+One modification I have to make is to revise the depth weighted diffusive rate, which is important for the integrity of the ISAM methane. 
+Any need to adjust the violence of gas mass conservation in the diffusion scheme?
+Also, the CH4 and O2 outfluxes calculated by the methane model is too small comparing to the actual imbalance amount. Any idea about how to fix this? Would be good to carefully check how CLm treat this violence.
+
+So right now the first thing we shall do is to resolve the issue related to the dissolution calculation and how to get rid of its impact to mass imbalance.
+The second one is to adjust the depth weighted diffusion calculation.
+
+Seems like including dissolution scheme helped the balance checking a lot.
+So next we shall check the case 3 that contains the water table in the middle of soil layers.
+
+okay, the case 3 also seems good to me.
+Next steps:
+1) Should revise the actual diffusive rate to the depth weighted diffusive rate. [Done]
+2) we shall consider each sources/sinks terms from calculated from the model. [Done]
+3) Need to debug the calculation of the trace gas flux across the atm-soil interface. 
+
+Done the step 1)
+
+After checking the source/sink term, I found the error to be related to the diffusion scheme that create large difference from the previous calculated value.
+I found the issue to be related to the abnormal source/sink term. Things are becoming clear.
+The abnormal sources/sinks are fixed. The issue is from the too tiny number of the air fraction.
+
+Seems like the WT calculation is not for every step? Need to check the code.
+It seems like the WT calculation is fine. Need not to adjust this.
+
+So let's move forward to check the source/sink calculation and the mass conservation in the diffusion scheme now.
+Source/sink term has been revised. Now need to check if the term is consistent with the term outside? Checked. It is fine.
+But a question is why the output showing the source/sink term alway be positive (source)? It is not correct for dry soil to have big source. Need to see why...
+Okay, the only source of CH4 is the methanogenesis. Have we overwstimated it?
+Yeah, it seems like we have some overestimation of methanogenesis. We shall return to check this later.
+Another more important error we shall fix is the CH4 mass conservation after the diffusion calculation.
+It seems to be a tough one... I have no clue why this error could happen. Probably the separated treatment on water table soil layer causing this mass conservation failure?
+Let's first check case 1 and case 2.
+This issue is more complicated than I thought...
+What component has caused this error? It makes no sense even after I divide source/sink terms by dis_factor. Could this be the issue about the mis-calculated diffusive flux?
+Highly possible.
+I believe the way calcuilating the surface flux is not correct. The error shall be included as a protion of the diffusion flux then. But first thing is to make sure the inside column is mass conserved.
+I have revised the code to adjust the mass balance by adding the error term into diffusion flux. It makes sense that error term shall be considered as diffusive flux.
+
+Okay, now the next step is going to check the error from every CH4 terms in the wetland methane module.
+1) I found the dry land has erroneous wetland methane emission due to extremely high arenchyma transportation. Need to check this term out for dryland... []
+2) Another option is to see if CLM has produced reasonable estimation?
+3) Once after removing the arenchyma transportation, we shall really focus on the soil oxidation. Need to check if the global and/or CONUS soil oxidation estimated from our model is going to be a correct number comparing to other published studies?
+4) Need to add the arenchyma transporation of oxygen.
+
+After testing on a global scale, we found more issues related in some points. Need to fix these bugs as well.
+Okay. seems like the dissolution factor can be very sensitivie even to the order of 1e-10.
+
+One more bug has been figured out when performing global simulation. We now need to check the wrong ebullition term that causing erroneous methane efflux.
+Now we may need to find a historical atmospheric methane curve and the projected atmospheric methane curve under different projections, at least for RCP8.5.
+Also, about how to design the experiments to calculate the global methane emission, any idea? [Carbon profile stabilized in the spinup. Also prevent to include any arenchyma transportation of CH4 for the non-wetland soils. Need to pay large attention to this point.
+
+Strangely, I found another bug related to the initilizing the water table depth. Check if water table has been read in correctly and if the initilization of naerobic, nanaerobic and nwt are correct.
+Could be an issue related to the perched water table? Yes, it is.
+So we need to add perhced water table into the initial file.
+
+Fixed another bug related to the methane exchange between water table and the air above.
+
+After getting the results of the global simulation, I found the following issues:
+1) The water table depth for eastern Siberia is not simulated correctly, hence we do not have enough methane emission from that region.
+2) The model accumulated too high the soil organic carbon in the tropics. For given the water table depth to be correct comparing to other study, this may be caused by a too fast downward transportation of SOC. However the bioturbation can be highly limited in that region.
+3) CH4 from the pan-arctic wetland is relatively low. This is erroneous comparing to other studies so we need to focus and fix this issue also.
+
+In summary, few issues can be diagnosed:
+1) Water table depth. Cannot be resolved by combining the topographic effect with varaible soil layers. We have to think about another approach. Maybe the topographic impact is too small? (Anyway, even we cannot capture the water table 100% correct, we may get reasonable wetland methane emission since we prescibed the wetland area.) 
+[Let's hold this issue till later.]
+
+[X] 2) Stop the aerenchyma transportation for non-wetland region
+Easy to finish. Shall address later.
+
+[X] 3) Ebullition is required to be examined again.
+Checked. The equations are correct following Wania et al., 2010. But the calculated C_max is too high (~2000mmol m-3). Since the CH4 concentration calculated from LPJ_Whyme is too high (> 5000mmol m-3), it seems okay to produce such a high amount of methane through ebullition. But based on Elberling et al., 2011, we can only find a saturatedCH4 concentration up to 200 mmol m-3 soil, around 800mmol m-3 water if VWC=0.25. And the ebullition will happen mostly around 500mmol m-3 (Walter et al., 1996). So I applied here a 0.25 scale factor to adjust the original V_max calculation to get the C_max near 500 mmol m-3. Further investigation is needed but right now let's just remediate the C_max through this rudimentary way. 
+
+[X] 4) Methane production is small in the arctic. Need to think about the reason?
+See the response of issue #7.
+
+[X] 5) Diffusive rate and plant root C input need to be modified!
+This one is right now the first priority! [We have site for checking the C14 profile!]
+Also, we have found too high carbon stock for evergreen forests in tropics.
+Now I mediated this issue by revising the rooting depth of the tropical forest. But still need more effort to constrain other physical states such as NPP, litter turnover and soil turnover. Can be the work for the next step (I suppose I shall not get involved into this calibration trouble again but seems like I have to mediate some processes). 
+
+[X] 6) Need to check if the methane fluxes from wetland has been added up to the bgc output?
+Shall be easy to finish. 
+I have checked and made sure the fluxes are accounted in the output.
+
+7) Soil resistance for gas diffusion by snow coverage is required.
+Shall take care of this later. Directly copy from CESM?
+
+[X] 8) Shall double check if the water table depth for wetland and inudated land has been applied correctly?
+This has been validated.
+
+[X] 9) A global test simulation shows a high root litter from grass? Need to check if the vertical transportation is too high or the rooting depth is too high.
+Too deep the rooting depth. So we here revised the parameters controling the rooting depth. This issue must be addressed in the SBGC paper properly.
+Also, we seems to underestimate the litterfall of the northern tundra and boreal forest. Shall check if the moss insulation we added has caused this issue?
+It will be helpful to review some previous studies about the control factors between rooting depth and root biomass. Such as plant species, soil temperature, soil moisture and nutrients. This can be the work for the next step.
+Okay, I fixed the overestimated rooting depth for several different biomes.
+
+========================= Apply ISAM model for preparing the AGU talk =======================
+I have done the first draft of the AGU slides. Next step shall be examining why we have a drastic decrease of the CH4 emission after changing the climate forcing from CRUNCEP to RCP scenarios. Something strange happened after switching the climate forcings.
+
+[X] 1) I believe I need to summarize all the parameters and their origin that being used in our methane model. In the meantime I shall be able to writing the model description of the methane module.
+Done
+
+2) Also, the next table should include the description of the sites being used by ISAM for model calibration or evaluation. A good strategy would be calibrating the model using 1 site in each category: upland arctic, lowland arctic, upland temeprate/tropics, lowland temperate/tropics, and evaluate the model using other sites remaining. If the site level data are not so enough, we shall think about applying the model to answer another more interesting question but not just a paper for model description only.
+
+[X] 3) I have found the model fail to calculate the soil methane oxidation correctly. Need to check the parameterization.
+Okay, I have now revised the key parameters.
+
+4) The diffusion of trace gas across the snow is needed.
+Has not added yet. May add soon. This is a similar issue as issue 7a)
+
+[X] 5) O2 transport through aerenchyma is required.
+Seems like I have already considered this? But the amount seems not correct. See if there has some issues?
+Need to check for wetland site. The upland may only have tiny amount of the impact.
+
+6) Is methane oxidation near the rhizosphere being required? Probably we shall get back to this point later.
+
+[X] 7) Need to investigate the wetland methane emission in the arctic. There has some issues related to water table and SBGC seems like.
+Seems like functions are working fine except too small production of the methane in the arctic lowland region. For given the reasonable respiration (also need to check against available data), I doubt the oxygen limitation is acting as a factor limiting the methane production since the underestimation of oxygen limitation would favor more SOM being decomposed to CO2 thus less labile SOM can support the methane production. 
+
+7a) Also I noticed that we have overestimated the methane diffusion. Though the actual amount of the diffusion is still under debate, but previous papers mentioned a controbution of methane emission from diffusion only about 10%. So more works need to be done preventing more methane emission through diffusion, thus ebullition and aerenchyma transportation could be enhanced.
+
+8) Methanogenesis in the saturated soil microsite is probably needed? Let's evaluate this later.
+
+[X] 9) How shall we go for the future projection of the inundated area?
+Shall use the precipitation data as a proxy for extropolating the inundated area.
+We applied a logistic equation to project the future inundated area via comparing with precipitation future projection from CESM simulation. 
+
+10) Two types of different methanotrophs need to be separated. One is the methanotroph residing in the rhizosphere, another is the methanitroph residing in the soil. Need to check this later?
+
+
+========================= Apply ISAM model for preparing the IALE talk =======================
+(1) First step is to evaluate the model globally. We selected several sites from Ameriflux and European fluxes database cluster for model testing.
+So we want to have a quick look first to see if the annual CH4 matches what we get from the sites we collected.
+The second step is to test on the single site level. Evaluate the met data and corresponding fluxes collected from Ameriflux/Euroflux sites (especially the WTD) and check if both matches each other.
+Then we test the methane module and see into detail the methane dynamics component. Any parameters we need to adjust in order to match the observed site level observation?
+
+
+Now the methodology is fixed. Though a further look at the published papers are required.
+[X] Update the inundated area. [Done. Seems like the year 2006-2012 were not finished correctly]
+[X] Update the extrapolation method. This must be fixed first! [I believe this method is okay.]
+[X] Redo Calibration. [Results look good. Though US-Tw1 does not have the response to the variation of water teble??]
+[X] Use the new parameters to redo the calculation! [Since not every sites are validated, I'd better finish those site then redo the calculation.]
+[X] Use new parameterization for limiting the methanogenesis within the anaerobic microsites. The same time the Fair condition is also considered in the paramterization.
+[X] Three sets of experiments need to be redo. [Need to finish this right away!]
+
+[X] Then write the results and discussion sections in the paper
+
+Need to think about the issue related to the wrong climate forcings. Currently I doubt the incoming solar radiation is low comparing to the CRUNCEP reanalysis, so we shall check this issue once getting time.
+
+
+

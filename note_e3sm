@@ -1,0 +1,98 @@
+The metrics and benchmarking packages that are currently public are the PCMDI Metrics Package (PMP), and the International Land Model Benchmarking (ILAMB). In addition, investigators who develop new diagnostics methodologies to analyze the Earth system should consider contributing their tools to the Toolkit for Extreme Climate Analysis (TECA) repository, if appropriate. The use of diagnostic tools like Cloud Associated Parametrization testbed (CAPT) and InitiaLIzed - ensemble Analysis/Development framework (ILIAD) are potential tools that can be used in model analysis.
+
+
+Land model v1:
+1. A vertically-resolved reactive transport solver based on BeTR (Tang et al. 2013) that has the following capabilities:
+	a. multi-phase (gaseous, aqueous, sorbed, etc.)
+	b. multi-species (C, N, P, etc.)
+	c. multi-reaction (decomposition, mineral surface interactions, etc.)
+2. A variably saturated head-based hydrology model using PeTSC solvers. Global and site-level simulations have been completed and publications documenting the capability are underway.
+3. Two different representations of the coupled C, N, and P cycles. Both approaches have global and site-level simulations completed and publications are being prepared to document the capabilities. Both approaches use the same global soil phosphorus datasets (Yang and Post 2011; Yang et al. 2013):
+	a. One based on the Equilibrium Chemistry Approximation (Tang et al. 2013; Tang and Riley 2015; Zhu et al. 2015a, b) to resolve nutrient competition
+	b. One based on Xiaojuan Yang's CNP model  (Yang et al. 2014, Yang et al. 2016).
+4. Crop model improvements, including a dynamic rooting depth distribution.
+5. A river transport model (MOSART) (Li et al. 2013; 2015) to replace the current RTM framework
+6. Generic interfaces implemented for coupling between vegetation and biogeochemistry codes, and for coupling between soil physics and biogeochemistry codes.
+7. Three capabilities to perform sensitivity, functional unit, and benchmarking analyses have been integrated:
+	a. A land model Bayesian UQ framework (Sargsyan et al. 2014, Safta et al. 2015)
+	b. A land model benchmarking framework based on the ILAMB package and leveraging the BGC-Climate Feedbacks SFA work
+	c. A functional unit testing framework for individual subroutines (Wang et al. 2014)
+8. Improvements to the land biogeochemistry spinup procedure.
+
+
+Models and MIPs:
+Coupled Model Intercomparison Project (CMIP) (Taylor et al., 2012)
+CMIP6 starts the future simulation from 2014 now!
+Water MIP (Haddeland et al., 2011)
+Inter-Sectoral Impacts MIP (ISI-MIP) (Warszawski et al., 2014)
+CMIP6 DECK experiments: Eyring et al., 2016
+MOSART, Li et al., 2013 - reservoir operation rule curve
+AMIP, Atmosheric model intercomparison project
+
+Coupling the signatures with principal component analysis to determine the most appropriate model structure from many candidate model structures. (Euser et al., 2013) This is interesting and I wonder how he did this?
+
+Global data:
+Precipitation -> 
+Global precipitation climatology center (Schneider et al., 2014)
+Global Precipitation Climatology Project (Adler et al., 2003)
+Runoff ->
+Global runoff reanalysis data from UNH (Fekete and vorosmarty 2011; Hall et al., 2006)
+Streamflow ->
+Global runoff data center (GRDC) in Koblenz, Germany
+ET->
+Global evapotranspiration data from MODIS
+SWC ->
+SMOS, SMAP, ASCAT
+Reservoir and Dam ->
+Global Reservior and Dam Database (GRanD) (Lehner et al., 2011)
+Soil thickness->
+Gloabl soil thickness map developed by Brunke et al., 2016
+
+Regional data:
+Climate ->
+NLDAS-2
+Catchment hydrology ->
+Model parameter estimation experiment (MOPEX) (Duan et al., 2006)
+Catchment attributes and meteorology for large-sample studies (CAMELS) (Newman et al., 2015)
+Streamflow ->
+388 USGS guages, being able to see the impact from building the dam (Wang et al., 2017)
+Soil ->
+Comprehensive soil property dataset over US, Soil Survey Geographic Database (SSURGO) from USDA
+
+Several UQ methods mentioned in Li et al.:
+OLS - Ordinary (standard generalized) least squares 
+IUWLS - inut uncertainty weighted least squares
+SVD - singular value decomosition, a dimension reduction method
+null space (calibration-constrained) Monte Carlo approach
+winding stair algorithm - allows the traceback of the different sources of prediction uncertainty associated with the signature measures.
+sequential random sampling method
+Morris global sensitivity test
+Budyko hypothesis (Budyko, 1958, 1974)
+
+Basic approches being used:
+Calibration: SVD to reduce dimension of the parameter space. PEST coupled with E3SM to perform the calibration and the multiple obj functions based on newly developed diagnostic metrics will be used. The specified convergence is defined then the calibration is done by repeating the simulation by replaceing the dimensionly reduced parameter set and by considering the weight of the forcing uncertainty using IUWLS.
+
+UQ (generating prior distribution of parameters): null space (calibration-constrained) Monte Carlo approach already built inside PEST package. The calibration process separate sensitive parameters or parameter combinations (This is tricky but makes sense) into solution space while non-sensitive parameters or parameter combinations into a null space. The parameters or parameter sets from the null space will be used to generate a set of calibration-constrained realization that will not deviate from the calibration. Thus these parameters will help us evaluate the uncertainty from other model oututs. 
+
+Dioagnose signature: winding stair propogation method allowing the trace back of the uncertainty sources. Several emergent relationships are proposed to examine land-atmosphere signature: (1) Budyko hypothesis to diagnose the signature of land-atmosphere interaction, (2) empirical correlation between soil mositure or evaporative ratio (ratio of latent heat flux to the sum of latent and sensible heat fluxes) and the height of PBL, to diagnose land-atmosphere interaction, (3) physical correlations underlying the soil moisture - precipitation feedback, such as triggering feedback strength (no reference). The atmosphere-land-river coupling is examined by examining the L'vovich theory (L'vovich 1979) that quantify the relationship between climatological indices and runoff/streamflow related indices. The signature for diagnosing the human influence is proposed by Wang et al., 2017 using a three reservoir model. The non-linear correlation between mean annual maximum flood (MAF) / coefficient of variations (CV) and reservior impact index (RII).
+
+Existing runoff schemes fall into two categories: 1. semi-distributed runoff schemes predicting runoff volume with spatial distribution functions of catchment properties: VIC, Probability distributed model (PDM) and TOPMODEL. 2. event-based runoff scheme such as the Soil Conservation Service (SCS) Runoff Curve Number (SCS-CN) (Mockus, 1972). Develop new event-scale diagnostic signature for water cycle dynamic is required. But how?
+
+Permafrost, Schaefer et al.
+(1) High latitude warming has resulted in an increase in permafrost temperature at 20 meters depth of 1-2 C since 1980 (Romanovsky et al., 2010a, 2010b)
+(2) Schuster et al., 2018, seems to be a data paper.
+(3) Microbial decay and associated respiration in frozen soils is limited by substrate availability in the thin liquid water films around soil particle and decreases rapidly with temperature below 0 C (Mikan et al., 2002). 
+(4) New liquid water curve for the pure organic matter and the actual liquid water curve is the combination of mineral and organic curves (Schaefer and Jafarov, 2016)
+(5) Give up frozen q10 but the same time use a liquied water fraction in the soil to increase the winter soil respiration. (Schaefer and Jafarov, 2016)
+(6) Do not allow root to grow in the frozen soil layer (Jafarov and Schaefer, 2016)
+(7) Consider the impact of frost heave on the change of soil later thickness (Lee et al., 2014). The InSAR measured ALT and seasonal surface subsidence (Schaefer et al., 2015) will be used as observation for constraining model parameterization.
+(8) The formation of thermokarst (Lee et al., 2014) by adding the ground ice stock from the map of permafrost and ground-ice conditions assuming a uniformly distributed within ths soil column and add extra water from the melting of ground ice into the model for scale adaptive river transport (MOSART) runoff model. The H changes caused by this thermokarst will be considered.
+(9) Improvement of the cryoturbation model by 1) updating the assumed D and v and 2) linking it to the thermokarst parameterization using the 14C measurement carried out through NGEE-arctic expeirments.
+(10) NGEE-arctic: Phase 1 focuses on north slope and coastal tundra using a multiscale measurement and modeling framework. Phase 2 focuses on the field and laboratory experiments on the Seward Peninsula.
+(11) E3SM's comprehensive Bayesian UQ framework? [Bader, 2017; Ricciuto et al., 2018]
+
+Convection schemes:
+Relaxed Arakawa - Schubert convection scheme (Moorthi, S. and Suarez, M.J., 1992. Relaxed Arakawa-Schubert. A parameterization of moist convection for general circulation models. Monthly Weather Review, 120(6), pp.978-1002.)
+
+
+

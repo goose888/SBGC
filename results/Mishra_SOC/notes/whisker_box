@@ -1,0 +1,7 @@
+1. 5 Values needed to plot whisker box plot:
+Min, Max, Median, 1st quatile Q1, 3rd quatile Q3
+
+2. How to distinguish outliers?
+First get the Median, Q1 and Q3. Second, use 1.5 times Inter-quatile range (IQR, Q3-Q1) away from Q1 or Q3 to set the fence. Data outside this fence can be regarded as outliers.
+Reference: http://www.purplemath.com/modules/boxwhisk3.htm
+

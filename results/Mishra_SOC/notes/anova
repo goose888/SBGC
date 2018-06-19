@@ -1,0 +1,89 @@
+I. Fixed effect one-way ANOVA
+
+First, we have
+1. Random variable Yij, j identify samples and i identifies the elements of the samples. j -> [1,J], i -> [1,n]
+2. Function:
+   epsilon(Yij) = uj  (1.1)
+   .or. 
+   epsilon(Yij) = u + aj (1.2)
+   Where epsilon() is calculation of expectation. uj is the sample value, u is the overall mean given by
+   u = 1/J * sigma_[1,J](uj) (1.3)
+   and aj is called treament effect:
+   aj = uj - u (1.4)
+3. So Yij = u + aj + Eij (1.5)
+   Where Eij is the error, are zero mean normal random variables with variance (sig_E)2, and the sum of aj is constrained to zero.
+
+Second, Let 
+   Y_bar_oo = 1/(nJ) * sigma_[1,n][1,J](Yij) (1.6)
+   be the mean of all the oibservations and
+   Y_bar_oj = 1/n * sigma_[1,n](Yij) (1.7)
+   be the mean of all the observations that were the result of the jth treatment.
+   We can insert (1.5) into (1.6)/(1.7) to show that Y_bar_oo is an unbiased estimator of u and Y_bar_oj is an unbiased estimator of u+aj
+   So Y_bar_oj - Y_bar_oo is an unbiased estimator of aj.
+
+Third, the total sum of squres:
+   SST = sigma_[1,n][1,J](Yij-Y_bar_oo)2  (1.8)
+   can be partitined as:
+   SST = sigma_[1,n][1,J]((Yij-Y_bar_oj)+(Y_bar_oj-Y_bar_oo))2
+       = n*sigma_[1,J](Y_bar_oj-Y_bar_oo)2 + sigma_[1,n][1,J](Yij-Y_bar_oj)2 
+          - 2*sigma_[1,n][1,J]((Y_bar_oj-Y_bar_oo)*(Yij-Y_bar_oj))  (1.9)
+   In (1.9), sigma_[1,n](Yij-Y_bar_oj)2 = 0 (sum of cross product) as can be derived from the constraint.
+   So, we summarize:
+   SST = SSA + SSepsilon   (1.10)
+   Where 
+   SSA = n*sigma_[1,J](Y_bar_oj-Y_bar_oo)2  (1.11)
+   And
+   SSepsilon = sigma_[1,n][1,J](Yij-Y_bar_oj)2 (1.12)
+   Here SSA is called the treatment sum of squares, or between blocks sum of squares. Has a J-1 degree of freedom
+   SSepsilon is called as the sum of squared errors, or within blocks sum of squares. Has a (n-1)*J degree of freedom
+
+Fourth, Testing for a treatment
+   The effect of a treatment is represented by coeficient aj in the model. 
+   So no treatment effect hypothesis is H0: a1 = ... = aJ = 0
+   or equivalently:
+   H0: sigma_[1,J](aj2) = 0.  (1.13)
+   The alternative hypothsis is, at least some of the coefficients aj are different from zero.
+   H1: sigma_[1,J](aj2) > 0.  (1.14)
+   Since Y_bar_oj - Y_bar_oo is already an unbiased estimator of aj, then following (1.11) SSA itself can be used.
+
+   Let's insert (1.5) into (1.11):
+   SSA = n*sigma_[1,J]( (u+aj+E_bar_oj) - (u+E_bar_oo) )2
+       = n*sigma_[1,J](aj2) + n*sigma_[1,J](E_bar_oj - E_bar_oo)2  (1.15)
+   The second term in (1.15) actually estimates (J-1)*sig_E2 under the independent and identical distribution (iid) assumption for each random variables. (Check the book for more detail)
+   So,
+   epsilon(SSA) = n*sigma_[1,J](aj2) + (J-1)*sig_E2   (1.16)
+   
+   For H0 to be true, we can have:
+   epsilon(SSA)/(J-1) = sig_E2   (1.17)
+   And for H0 to be false, we can get an epsilon(SSA)/(J-1) larger than sig_E2
+   Construct a test of H0 if another statistic can be found that estimates only sig_E2 regardless of whether or not H0 is true.
+   We can see SSepsilon can be applied to constrcut the F function:
+   F = (SSA/(J-1)) / (SSepsilon/((n-1)*J)  (1.18)
+
+   Through the derivation from the book we can get:
+   F ~ F(J-1, (n-1)J)
+   under H0. Thus we finally obtain the result that H0 can be tested at the (1-p) significance level by comparing F computed from (1.18) against the q-quantile of F(J-1, (n-1)J) obtained from Appendix G.
+
+Fifth, we can easily figure out that coefficient of determination to tell the proportion R2 of variance due to treatments.
+   R2 = SSA/SST   (1.19)
+   Which can be used to diagnose the proportion of the response variable variance that is explained by the fitted model.
+   Adjusted R2 is given by
+   Ra2 = (SSA - SSepsilon*(J-1)/(J(n-1))) / SST
+
+II. Random effect one-way ANOVA
+
+First, to consider randome effect, we need to change (1.5) to:
+   Yij = u + Aj + Eij  (2.1)
+   where Aj are random variables called 'random effects', are iid conform to N(0, sig_A2) instead of fixed value
+   So we can see that,
+   Yij ~ N(0, sig_A2 + sig_E2)   (2.2)
+
+Second, instead of testing that the treatment changes the mean of the response variable, we are now interested in testing the null hypothesis that the treatments do not induce between block (or between sample) variability:
+   H0: sig_A2 = 0
+   H1: sig_A2 > 0
+   And the same test (1.15 - 1.18) we can use here except:
+   epsilon(SSA/(J-1)) = n*sig_A2 + sig_E2   (2.3)
+   instead.
+   Also we have an updated R2 and Ra2, check the book for more information. Here R2 estimates thr proportion of variance that is induced by the 'treatment' variation.
+
+III. Two-way ANOVA
