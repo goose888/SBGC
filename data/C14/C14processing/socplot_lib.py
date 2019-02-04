@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Wed 19 Jul 2017 10:55:37 PM EDT
+* Last Modified : Wed Nov 14 02:00:52 2018
 
 * Created By : Shijie Shu
 
@@ -48,7 +48,7 @@ def plot_soilprof(socprof, Y, tit, path):
 
     return status
 
-def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path, mod2=None, Ymod2=None, xticks=None, fontsize_ax=24, fontsize_lg=30, legendps='upper left'):
+def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path=None, mod2=None, Ymod2=None, xticks=None, yticks=None, xlim=None, ylim=None, fontsize_ax=24, fontsize_lg=30, legendps='upper left'):
     """ Make plot for a single D14C profile with both observation and modeled
     outputs
     This updated version included more settings on axes and title 
@@ -60,8 +60,11 @@ def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path, mod2=None, Ymod2=None, xticks
         mod2 --- Modeled SOC profile for another ISAM case(kgC m-3)
         Ymod2 --- Corresponding soil depth for model (cm)
         tit --- Title of the figure
-        path --- Name and path of the output figure (PNG)
+        path --- Name and path of the output figure (PNG), default is to display on screen
         xticks --- The ticks for x axis (if set) 
+        yticks --- The ticks for y axis (if set), default is to 100cm
+        xticks --- Lim of x axis (if set) 
+        yticks --- Lim of y axis (if set), default is to 102cm
         fontsize_ax --- Font size of the axis
         fontsize_lg --- Font size of the legend
         legendps --- Position of the legend
@@ -69,9 +72,16 @@ def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path, mod2=None, Ymod2=None, xticks
         status --- Return value if the figure is closed successfully
     """
 
-    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(16,10))
+    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10,6.5))
     ax1 = fig.axes[0]
-    plt.gca().invert_yaxis()
+    if xlim is not None:
+        plt.xlim((xlim[0], xlim[1]))
+    else:
+        plt.xlim((-2, 102))
+    if ylim is not None:
+        plt.ylim((ylim[0], ylim[1]))
+    else:
+        plt.ylim((-5, 105))
     # ax2 = ax1.twiny()
     # Define resources, will be added later
     #axfont = {'family' : 'normal',
@@ -87,27 +97,45 @@ def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path, mod2=None, Ymod2=None, xticks
     ax1.grid(color='gray', which='major', axis='both', alpha=0.3)
     if mod2 is not None:
         ax1.legend(['obs', 'ISAM', 'ISAM_org'], loc=legendps, fontsize=fontsize_lg)
-    else:
-        ax1.legend(['obs', 'modeled'], loc=legendps, fontsize=fontsize_lg)
+    #else:
+        #ax1.legend(['obs', 'modeled'], loc=legendps, fontsize=fontsize_lg)
+    # Set Xticks
     if xticks is not None:
         ax1.set_xticks(xticks, minor=False)
     else:
         start, end = ax1.get_xlim()
         ax1.xaxis.set_ticks(np.arange(start, end,(end-start)/6))
+    # Set Yticks
+    if yticks is not None:
+        ax1.set_yticks(yticks, minor=False)
+    else:
+        yticks = (0, 50, 100, 150)
+    plt.gca().invert_yaxis()
+
     # Set font size
     for item in ([ax1.title, ax1.xaxis.label, ax1.yaxis.label] +
              ax1.get_xticklabels() + ax1.get_yticklabels()):
-        item.set_fontsize(20)
+        item.set_fontsize(24)
     # ax1.xaxis.label.set_fontsize(fontsize_ax)
     # ax1.yaxis.label.set_fontsize(fontsize_ax)
     # ax1.get_xticklabels().set_fontsize(fontsize_ax)
     # ax1.get_yticklabels().set_fontsize(fontsize_ax)
+
+    # Set tick formats
+    plt.minorticks_on()
+    ax1.tick_params(axis="x", which="both", top=True)
+    ax1.tick_params(axis="y", which="both", right=True)
+    ax1.tick_params(axis="both", which="both", direction="in", pad=10)
+    ax1.tick_params(axis="both", which="major", length=8, width=2)
+    ax1.tick_params(axis="both", which="minor", length=3, width=1)
     for tl in ax1.get_xticklabels():
-        tl.set_color('g')
+        tl.set_color('k')
     fig.suptitle(tit, fontsize=30)
     fig.tight_layout() # Or equivalently,  "plt.tight_layout()"
-    # fig.savefig(path)
-    plt.show()
+    if path is not None:
+        fig.savefig(path)
+    else:
+        plt.show()
     status = plt.close("all")
 
     return status
@@ -337,7 +365,8 @@ def plot_obsvsmodshades_color(obs, Yobs, mod, Ymod, sen1, sen2, Ysen, cases, pal
     yticks = (0, 50, 100, 150)
     ax1.set_yticks(yticks, minor=False)
     plt.gca().invert_yaxis()
-    plt.xlim((-1100, 300))
+    # plt.xlim((-1100, 300))
+    plt.xlim((0, 140))
     # ax2 = ax1.twiny()
     # Define resources, will be added later
     #axfont = {'family' : 'normal',
@@ -530,7 +559,7 @@ def plot_prof_with_errbar(X1, Y, Xstd, tit, path):
 
     return status
 
-def plot_obsvsmod_with_errbar(Xobs, Yobs, Xmod, Ymod, Xobs_std, Xmod_std, tit, path):
+def plot_obsvsmod_with_errbar(Xobs, Yobs, Xmod, Ymod, Xobs_std, Xmod_std, tit=None, path=None):
     """ plot SOC profile with error bar
     Input:
         Xobs --- observed mean SOC profile (kgCm-3)
@@ -571,7 +600,10 @@ def plot_obsvsmod_with_errbar(Xobs, Yobs, Xmod, Ymod, Xobs_std, Xmod_std, tit, p
 
     fig.suptitle(tit, fontsize=20)
     fig.tight_layout() # Or equivalently,  "plt.tight_layout()"
-    fig.savefig(path)
+    if path is not None:
+        fig.savefig(path)
+    else:
+        plt.show()
     status = plt.close("all")
 
     return status

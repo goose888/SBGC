@@ -64,8 +64,8 @@ def cal_tau(d14c, smpyr, savecostn, tauonly):
     '''
     besttau = np.zeros((d14c.shape[0],savecostn))
     bestcost = np.zeros((d14c.shape[0],savecostn))
-    taufast = np.arange(1,2000,5)
-    tauslow = np.arange(2000, 200000, 50)
+    taufast = np.arange(1,2000,1)
+    tauslow = np.arange(2000, 200000, 5)
     atm14C = scipy.io.loadmat('atmD14C_50kBP-2012.mat')
     atmD14C = atm14C['atmD14C'][:,1]
     atmFM = atmD14C/1000. + 1.
@@ -123,3 +123,45 @@ def cal_D14Ctosmpyr(tau, sampleyr):
             # use prebomb_FM
             outD14C += FMtoD14C(cal_prebomb_FM(1./obs)),
     return outD14C
+
+
+def avg_soc_weighted_d14c(depth, zsoih, dz, wt, profile):
+    """ Weighted (usually SOC-weighted) average D14C profile till the preset depth. 
+        Only accepts one profile as input at one time
+    Input:
+        depth --- the depth where D14C aggregate to (m)
+        zsoih --- depth of the interface of each soil layer, nlev+1
+        dz --- thickness of each soil layer (m), nlev
+        wt --- weight profile
+        profile --- SOC profile in kgC/m3, nlev
+    Output:
+        val --- The averaged bulk D14C, scalar. Will be nan if dz is not
+                deep enough.
+    """
+    nlev = len(profile)
+    val = 0.
+    wt_all = 0.
+    pt = 0
+    # Point to the layer right below 30cm
+    for j in range(0, nlev):
+        if(zsoih[j] >= depth):
+            pt = j
+            break
+    if(zsoih[nlev] < depth):
+        val = float('nan')
+    else:
+        # Calculate the weight
+        for j in range(0, pt):
+            if(j==pt-1):
+                # Only obtain the weight above the preset depth
+                wt_all = wt_all + wt[j]*(depth - zsoih[j])/dz[j]
+            else:
+                wt_all = wt_all + wt[j]
+        for j in range(0, pt):
+            if(zsoih[j+1] < depth):
+                val = val +  wt[j]*profile[j]/wt_all
+            else:
+                val = val +  profile[j] * (wt[j]*(depth - zsoih[j])/dz[j]) / wt_all
+
+    return val
+

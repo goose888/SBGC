@@ -14,9 +14,8 @@ ffwnc <- as.character(args[2])
 fmasknc <- 'surfdata_05x05_13reg.nc'
 maskvar <- 'REGION_MASK_CRU_NCEP'
 oxidvar <- 'ch4_oxid'
-ch4var <- 'ch4_flux'
+ch4var <- 'ch4_prod'
 fwvar <- 'FW'
-respvar <- 'resp'
 nlon <- 720
 nlat <- 360
 res <- 0.5
@@ -30,13 +29,15 @@ latdim <- dim.inq.nc(nc, "lat")
 # get mask
 maskval <- var.get.nc(nc, maskvar)
 close.nc(nc)
+#print('tag1')
 
+# get sink
 nc <- open.nc(fch4nc, write=FALSE)
 # get oxid
 oxid <- var.get.nc(nc, oxidvar)
 ch4 <- var.get.nc(nc, ch4var)
-resp <- var.get.nc(nc, respvar)
 close.nc(nc)
+#print('tag2')
 
 # get fractional water
 nc <- open.nc(ffwnc, write=FALSE)
@@ -45,8 +46,8 @@ close.nc(nc)
 #print('tag3')
 
 #ch4[ch4>0]=0
-#fw[fw<0] <- NA
-#fw[fw>0] <- 1.0
+#fw[fw<=0.01] <- NA
+#fw[fw>0.01] <- 1.0
 fw[fw<0] <- NA
 fw[fw>0.01] <- NA
 fw = 1-fw
@@ -58,8 +59,6 @@ ch4[maskval < 12]  <- NA
 ch4[maskval > 12]  <- NA
 fw[maskval < 12]  <- NA
 fw[maskval > 12]  <- NA
-resp[maskval < 12]  <- NA
-resp[maskval > 12]  <- NA
 
 # Get the grid area
 grid_area <- matrix(-9999., nrow=nlon, ncol=nlat)
@@ -75,13 +74,10 @@ for (i in 1:nlat) {
 }
 oxid_m <- oxid*grid_area
 ch4_m <- ch4*grid_area*fw
-resp_m <- resp*grid_area
 
 # Summarize the total number 
 oxid_tot <- sum(colSums(oxid_m, na.rm = TRUE), na.rm = TRUE)/1e12/2.2
 ch4_tot <- sum(colSums(ch4_m, na.rm = TRUE), na.rm = TRUE)/1e12/2.2
-resp_tot <- sum(colSums(resp_m, na.rm = TRUE), na.rm = TRUE)/1e12/2.2
 
 #print(oxid_tot)
-#print(resp_tot)
 print(ch4_tot)

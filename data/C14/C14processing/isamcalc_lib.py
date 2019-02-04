@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Tue 01 Aug 2017 11:15:32 PM EDT
+* Last Modified : Tue Oct 23 17:47:33 2018
 
 * Created By : Shijie Shu
 
@@ -143,3 +143,68 @@ def latlon_2_idx(lat, lon):
     loc = [latid, lonid]
 
     return loc
+
+def agg_topsoil(prof):
+    """ Aggregate the value of the top soil (0-30cm) by adding the first 5 layer of ISAM soil output
+    Input:
+        prof --- soil profile (needs at least 5 layers)
+    Output:
+        val --- scalar
+    """
+
+    val = np.sum(prof[0:5])
+
+    return val
+
+def avg_wt_topsoil(weight, prof):
+
+    """ Get the mean value of the top soil (0-30cm) by averaging the first 5 layer of ISAM soil output
+        using the predefined weight
+    Input:
+        weight --- the values used as weight. No need to standardize before calling this subroutine
+        prof --- soil profile (needs at least 5 layers)
+    Output:
+        val --- scalar
+    """
+
+    weight_tot = np.sum(weight[0:5])
+    wt = weight[0:5] / weight_tot
+    val = np.nanmean(wt*prof[0:5])
+
+    return val
+
+def agg_subsoil(prof):
+    """ Aggregate the value of the subsoil (30-100cm) by adding the 6-8 layer of ISAM soil output
+    Input:
+        prof --- soil profile (needs at least 8 layers), no NA is acceptable
+    Output:
+        val --- scalar
+    """
+
+    val = prof[5]+prof[6]+0.3*prof[7]
+
+    return val
+
+
+def avg_wt_subsoil(weight, prof):
+
+    """ Get the mean value of the subsoil (30-100cm) by averaging the first 5 layer of ISAM soil output
+        using the predefined weight
+    Input:
+        weight --- the values used as weight. No need to standardize before calling this subroutine
+        prof --- soil profile (needs at least 8 layers)
+    Output:
+        val --- scalar
+    """
+
+    weight_tot = weight[5]+weight[6]+0.3*weight[7]
+    wt = [0, 0, 0]
+    for i in np.arange(0,3):
+        if (i<=1):
+            wt[i] =  weight[(i+5)] / weight_tot
+        else:
+            wt[i] = 0.3*weight[(i+5)] / weight_tot
+    val = np.nanmean(wt*prof[5:8])
+
+    return val
+

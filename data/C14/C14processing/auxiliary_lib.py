@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Tue Jun 19 00:18:53 2018
+* Last Modified : Sun Nov  4 01:38:20 2018
 
 * Created By : Shijie Shu
 
@@ -61,3 +61,10 @@ def sweepdata(filename):
                 print "value is ", j
                 raw_input("Press Enter to continue...")
 
+def get_address(obj):
+    """  get the address of the object
+    arguments: 
+    obj: the object which one want to know its address
+    """
+   
+    return hex(id(obj))

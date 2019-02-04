@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Need grass for processing the data
 grasscr Global Permafrost
 v.in.ascii --overwrite input=allsites.asc output=N_circum_c14_sites fs='space'
 v.db.addtable map=N_circum_c14_sites

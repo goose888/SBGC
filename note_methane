@@ -213,5 +213,14 @@ Now the methodology is fixed. Though a further look at the published papers are 
 
 Need to think about the issue related to the wrong climate forcings. Currently I doubt the incoming solar radiation is low comparing to the CRUNCEP reanalysis, so we shall check this issue once getting time.
 
+Now we have an issue related to the global scale simulation. I found the single site simulation works well but when simulate on a global scale the related single site produce a big negative value which is majorly caused by an abnormally high CH4 ebullition, driven by a verh high CH4 concentration in the deep soil (layer 8 and 9). What could be the possible reason causing this issue?
+1) Uninitilized variables? 
+2) Shall check all the statements that global simulation differing from the single simulations.
 
+========================== Tasks for the draft revision ==================================
+(1) One site is needed to be corrected through a new calibration.
+[X] (2) Adding the output of all fluxes components, including production, oxidation, diffusion (can be calculated as a residue), ebullition and aerenchyma transport.
+We found the oxidation to be several orders too high in Florida! Any issues happenning there?
+We found the oxidation at water table contributed several orders higher oxidation than from other layers. Seems like somthing not correct, either the CH4, O2 concentration, or the oxidation potential. Currently we ignore the oxidation from the water table to correctify this issue.
 
+[X] (3) Found an issue related to unsuccessfully writing the restart file. Now checking.

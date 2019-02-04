@@ -44,10 +44,10 @@ maskval[1:360,] = maskval[361:720,]
 maskval[361:720,] = temp[1:360,]
 
 # Mask out values outside the US
-#oxid[maskval < 12] <- NA
-#oxid[maskval > 12] <- NA
-#ch4[maskval < 12]  <- NA
-#ch4[maskval > 12]  <- NA
+oxid[maskval < 12] <- NA
+oxid[maskval > 12] <- NA
+#ch4[maskval < 13]  <- NA
+#ch4[maskval > 13]  <- NA
 
 # Get the grid area
 grid_area <- matrix(-9999., nrow=nlon, ncol=nlat)

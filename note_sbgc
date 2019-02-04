@@ -212,4 +212,71 @@ Five things need to be updated in this first version of the draft:
 4) The turnover time we collected from the paper lacks the description of the methodology, hence we must add enough description of its methodlogy. Also, more turnover time from literature would be great to incoporate into this comparison, although I can hardly find more...
 5) A figure showing turnover time against T,W is what I strongly want to look at. So I shall check this also.
 
+[Done the first version of the draft, need to modify]
+
+1) Provide more detail about why and how to model the cryoturbation following O'Neill and Miller, 1985.
+First I want to check if the heave calculated by the model matches the number other models calculated?
+But the first question is how to get the frost heave rate from the model. (Adding the frost heave every week together)
+The second question is from where I can get data? (Now only has laboratory test data available from the reprot)
+A direct way to simply see if our model did a good job on predicting the frost heave rate is to compare the Mishra's soil sample output with that from the laboratory test, through using the bar chart and std.
+
+[X] We have trouble representing the frost heave rate in model. Currently we estimated 100 times higher frost heave rate in the model and two possible errors we may have in the model: 1) dpsidz is large, this maybe caused by the tiny dz in the top soil thus causing the finite difference scheme becoming erroneous. 2) hydraulic conductivity maybe too high in the freezing layer.
+So it is reasonable to use the total phase change amount of water to constrain the estimated frost heave rate, but the number is still large.
+Also, is it possible to think about a better approach for initializeing the soil ice lens? Like that being used in Rempel 2007. This probably is too complicated so I shall avoid it at this time.
+
+[X] Check hydraulic conductivity first!
+Done. The soil matric potential is a more severe problem comparing to the hydraulic conductivity.
+
+By comparing with the results of the report, I found the soil matric potential (in unit -kPa) calculated from the model to be relatively high. Any idea about this issue?
+Also, the modeled hydraulic conductivity then to be low. A comparable scale is approxiamately equals to the saturated hydraulic conductivity, about 1e-3 - 1e-5 mm/s.
+Despite these errors maybe caused by inprecise model estimation, after adding the constraint of the total phase change we have changed the estimated frost heave rate within the same order. But we would like to run the model once more and check how the statistics look like?
+
+Next is to revise the results and make more detailed figures.
+[X] (1) Read paper to see how I can represent the uncertainties that brought from using the different parameters?
+What figures I need to produce?
+A: I have done the same figure but the sensitivity analysis has been changed to use a strategy perturbing those uncertain parameters one by one around the calibrated values, except for D and v. 
+
+[X] (2) Revise the frost heave model description. This is important and I need to clarify what I have done before doing further simulations.
+A: I highlighted in several part of the paragraph the interesting findings of the cryoturbation. Would like to check more?
+
+[X] (3) What will be a good strategy to separate the impact from different processes to the modeled turnover?
+Upon vertically resolved model, we see how large the impact of these each feature: moss insulation, accumulation of organic layer, cryoturbation and bioturbation.
+A: I used the regular way, by which set either paramters to infinity or infinitesimal to force the corresponding component stop working and thus check their impact on the calculated turnover. Let me figure out later if this point has been taken care.
+
+So now I have revised this draft for the second time. Still not feeling enough about this manuscript. Several issues I might have ignored:
+(1) Equifinality problem when calibrating the model. I may have to say something about the benefit by using the dual constraint from both 14C and SOC to avoid this equifinality problem but I also need to point out that this issue is tough to resolve and what could be the potential next step for figuring this point out and how to prove that the equfinality issue affect not much in my final results? If I cannot tell how I can fix this problem, I shall describe how strong this equifinality problem may hamper my estimated SOC turnover from the real SOC turnover.
+
+(2) Potential issue about model estimated total global SOC. Can I come up with a simple number about how this can impact the globally estimated value in the discussion?
+
+(3) I feel not enough about discussing the calculated turnover time. What I could do to address more interesting topic about the calculated SOC turnover? Discuss how different processes have affected the calculated SOC? Or I shall get more literature to support the calculated SOC turnover time I have obtained using the ISAM-SBC model? Check the papers with relevant topic to see what they have found? Also, can we do a resolved environmental factor vs. the calculated SOC turnover for different model and compare with the incubation studies?
+
+(4) Still problem about writing. I see Charlie's paper containing a results and discussion paragraph with strong logics behind. In my paper I lacks this kind of linkages and I may have to think about how to improve this?
+
+(5) I noticed the highlights from Charlie's paper are not explicitly mentioned. But in my paper I shall be careful about this.
+
+(6) Unknown soil depth mentioned in Koven et al., 2013 was illustrated by the maximum depth of the diffusion in the ISAM-SBC. Shall say something in this line?
+
+(7) Possible reasons why we cannot capture some of the features shown in the observation but not in our model. I have to come across all these model deficit, point them out in the results  and then add the detailed assumptions into the discussion.
+
+(8) May check these papers mentioned in Koven's paper:
+Koarashi et al., 2012
+
+(9) Clarify the idea why to include also rooting depth and bulk density.
+
+Now the next step is to [X] revise the figures with considering other observation based studies.
+
+It seems like the rooting depth for boreal forest is too high so that induced a very large amount of SOC in the top 1m soil comparing to the original version. Why this has not happened in the previous version of the model? Need to figure out.
+Seems like the old results also show a higher boreal forest SOC storage comparing to the NCSCD dataset, which makes sense when the model considering the carbon from the root distribution.
+
+==========================================================
+
+The final revision of the draft:
+(1) Need to add a figure to illustrate how the model has captured the active layer thickness in the model. I'm not sure if I have done the figure before but wondering if our results improved the simulation of the active layer thickness.
+I think we shall not show the active layer thickness or we can say it is already available through the temperature profile.
+
+(2) Next, how can I explain the improvement that cruyoturbation brought when simulating the SOC content and D14C vertical profile?
+
+(3) Make a figure for ice lens growth rate versus the cryosuction rate. And this figure shall show something which can differ my study against others?
+
+(4) What can I do to strengthen the uncertainty analysis? What kind of "base case" shall I use? How to borrow some ideas from Haroon's work?
 
