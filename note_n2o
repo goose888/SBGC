@@ -1,0 +1,39 @@
+Global N2O emission from natural (or maybe anthropogenic) soils
+So now I'm confused about Ying's strategy on how to use part of the observation for calibration and another part of that for evaluation.
+Need to think about the process she used for calibration. See if they make sense or not?
+Shall be important to work on the following stuff:
+[D] 1) Check model implementation of N2O emission. See if I have rigorousely following the schemes. Now I have corrected the schemes in the code.
+[D] 2) Check model output of temperature and moisture, both are important for model calibration. Shall first prove that model has captured the environmental condition correctly. If not how about forcing these conditions as the observation show when we perform the calibration? What kind of observations are available in our current database?
+It seems like the vwc and wfps are captured better comparing to the estimated N2O emission. It is a good approximation that I shall use the observed wfps for forcing and calibrating the N2O emission of the model. But this step will be done after we carefully adding the N2O emission module inside ISAM.
+[P] 3) Temporal scale is weekly in ISAM so we only need to consider the weekly averaged values in the model in order to finalize the calibration. How about using the observed WFPS to force model.
+[D] 4) Organize the model algorithms in the word document as part of the SM of the paper.
+[P] 5) Are we able to use the FFSQP tool for the calibration? I think this could be a very good idea!
+[*] 6) Decide what paramters we need to consider? Also from where can we verify the mineral N content in the field? Need to see if some literatures gave the answer!
+[P] 7) Wonder if it is a good idea to include the SPSD scheme into this paper. We need oxygen content to calculate SPSD, thus a vertically resolved model is necessary. The same time a more detailed N cycle model at different model layers (especially mineral N amount, which I have not examined into detail in ISAM-SBGC model) is required. Currently I searched one paper (Rubol et al., 2013, Advances in Water Resources) and regressed the empirical correlations between C_O2 and WFPS: Linear for wfps1 < 0.6 and Polynomial for wfps1 >= 0.6. Also I wonder our current incorporation of SPSD scheme needs more revisions. This point needs more discussion.
+[D] 8) Check the credential of Ying's work. We need to see if some of her work are not finished correctly. Now after looking at the code I found Ying has manipulated the values of the met forcings in the model for several specific sites. Since N2O is estimated on the weekly time scale, I would like to incorporate her modification inside the code into the matlab code and revise the value outside. It seems like the changed climate data improved at some level the estimated wfps, but not obvious. Now we shall check the implementation of the calculation in ISAM following Ying Jin's work.
+[D] 9) Double check the python code plotting the results. Make sure we have plotted everything correctly. It seems to be correct.
+[D] 10) Another question is that why we have the negative N2O emission from the observation? Are these site observations considering the soil N2O uptake? Yes. After the discussion during the AGU meeting I confirmed this point.
+[D] 11) Double check the method Yang/Yin calculates the WFPS. It seems like they used the sm above 3cm (first 3 layers) to calculate the wfps for the whole gridcell. Not sure the reason they don't use 8 layers (1m) and if this approach makes sense. I need a reference! 
+Okay, after checking Yin's master thesis I found the number 25cm (which is the depth representing 80% of OC) to be the one she presumably used. Now I'm using this one.
+[D] 12) Seems like different paper presented wfps averaged at different soil layers. In ISAM we uniformly used the 25cm for site and global simulation. Is it a good approch to calibrate site using the observed wfps not for the 25cm but run the global case at 25cm? Check for the paper and see which WFPS the publications have used. I feel this to be not an issue for 1-D SOC model, but the incorporation of N2O into 1-D model needs further consideration of other issues. After checking the observed WFPS I would apply this WFPS for each site separately. One thing I have noticed it that N2O emission measurement from chamber system is the total N2O emission across the whole soil column into the atmosphere, hence when comparing to the observation we need to model the whol 25cm WFPS. But in the case to compare WFPS with the observed WFPS we have to use the pre-defined depth from the observation. Kind of tricky...
+Bell --- 5cm
+Arrou --- 20cm
+La Selva --- 2cm (It is very shallow!)
+La Saussaye --- 20cm
+HOGLD_BEECH --- 10cm
+HOGLD_SPRUCE --- 10cm
+CPER_PN (Central Plains Experiment Range - native pasture) --- 15cm (assuming the same depth as soil temperature)
+CA-Ojp --- 15cm (Soil moisture)
+CA-Oas --- 15cm
+CA-Obs --- 15cm
+SSA-OA --- 7.5cm (Trust YingJin. Citation: Sellers et al., 1997. BOREAS in 1997: Experiment overview, scientific results, and future directions. This is a very nice paper!)
+
+Ref:
+[] --- status box
+* --- working on
+D --- done jobs
+P --- pending jobs which is waiting for the finalization of previous jobs or waiting for some other pre-requisite such as input data
+
+Some interesting notes:
+Nitrification is also known to be inhibited in aeration-limited conditions (i.e. WFPS>0.8) (Mosier et al., 2002). 
+

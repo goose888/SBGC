@@ -12,11 +12,12 @@ args = commandArgs(trailingOnly = TRUE)
 fch4nc <- as.character(args[1])
 ffwnc <- as.character(args[2])
 fmasknc <- 'surfdata_05x05_13reg.nc'
+fwetnc <- 'surfdata_05x05.nc'
 maskvar <- 'REGION_MASK_CRU_NCEP'
-oxidvar <- 'ch4_oxid'
-ch4var <- 'ch4_flux'
-ch4var_2 <- 'ch4_ebul'
-ch4var_3 <- 'ch4_aere'
+ch4var <- 'ch4_diff'
+ch4var_dry <- 'ch4_diff_dry'
+ch4var_wet <- 'ch4_diff_wet'
+ch4var_inund <- 'ch4_diff_inund'
 fwvar <- 'FW'
 nlon <- 720
 nlat <- 360
@@ -31,15 +32,20 @@ latdim <- dim.inq.nc(nc, "lat")
 # get mask
 maskval <- var.get.nc(nc, maskvar)
 close.nc(nc)
-#print('tag1')
 
-# get sink
+# Open and get the wetland fraction
+nc <- open.nc(fwetnc, write=FALSE)
+frac_wet <- var.get.nc(nc, 'FW')
+
 nc <- open.nc(fch4nc, write=FALSE)
-# get oxid
-oxid <- var.get.nc(nc, oxidvar)
-ch4 <- var.get.nc(nc, ch4var)
+# get flux
+ch4_avg <- var.get.nc(nc, ch4var)
+ch4_wet <- var.get.nc(nc, ch4var_wet)
+ch4_inund <- var.get.nc(nc, ch4var_inund)
+ch4_dry <- var.get.nc(nc, ch4var_dry)
 close.nc(nc)
-#print('tag2')
+#oxid <- var.get.nc(nc, oxidvar)
+#resp <- var.get.nc(nc, respvar)
 
 # get fractional water
 nc <- open.nc(ffwnc, write=FALSE)
@@ -47,13 +53,20 @@ fw <- var.get.nc(nc, fwvar)
 close.nc(nc)
 #print('tag3')
 
-#ch4[ch4>0]=0
-fw[fw<=0.01] <- NA
-fw[fw>0.01] <- 1.0
+frac_inund <- fw - frac_wet
+
+# Now the output already considered wetland, inundated land and 
+# dryland separately
+
+## CH4 for all non-wetland #####
+#ch4 <- ch4_dry
+#ch4[ch4>0] = NA     # The condition to only get the results of dry soil
+## CH4 for wetland #####
+ch4 <- ch4_wet + ch4_inund
+## CH4 for all #####
+#ch4 <- ch4_avg
 
 # Mask out values outside the US
-oxid[maskval < 12] <- NA
-oxid[maskval > 12] <- NA
 ch4[maskval < 12]  <- NA
 ch4[maskval > 12]  <- NA
 fw[maskval < 12]  <- NA
@@ -71,12 +84,11 @@ for (i in 1:nlat) {
               sin((lat[i] + res/2)*pi/180))/(360/res)
   }
 }
-oxid_m <- oxid*grid_area
-ch4_m <- ch4*grid_area*fw
 
-# Summarize the total number 
-oxid_tot <- sum(colSums(oxid_m, na.rm = TRUE), na.rm = TRUE)/1e12/2.2
-ch4_tot <- sum(colSums(ch4_m, na.rm = TRUE), na.rm = TRUE)/1e12/2.2
+##### CH4 for the separated categories only #####
+ch4_m <- ch4*grid_area
 
-#print(oxid_tot)
+# Summarize the total number, TgCH4 m-2 yr-1
+ch4_tot <- sum(colSums(ch4_m, na.rm = TRUE), na.rm = TRUE)/1e12
+
 print(ch4_tot)

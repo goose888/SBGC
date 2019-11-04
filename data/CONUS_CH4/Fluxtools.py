@@ -6,7 +6,7 @@
 
 * Creation Date : 23-03-2018
 
-* Last Modified : Tue 01 Aug 2017 11:15:32 PM EDT
+* Last Modified : Tue Feb  5 01:30:06 2019
 
 * Created By : Shijie Shu
 
@@ -61,6 +61,8 @@ def hr2daily(srs, method="mean", nstep=48):
         daily_srs[i] = np.nanmean(srs[i*nstep:(i+1)*nstep])
         if(method == "agg"):
             daily_srs[i] = daily_srs[i] * 24.
+        if(method == "avg"):
+            daily_srs[i] = daily_srs[i] * 1.
 
     return daily_srs
 

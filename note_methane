@@ -212,15 +212,63 @@ Now the methodology is fixed. Though a further look at the published papers are 
 [X] Then write the results and discussion sections in the paper
 
 Need to think about the issue related to the wrong climate forcings. Currently I doubt the incoming solar radiation is low comparing to the CRUNCEP reanalysis, so we shall check this issue once getting time.
-
-Now we have an issue related to the global scale simulation. I found the single site simulation works well but when simulate on a global scale the related single site produce a big negative value which is majorly caused by an abnormally high CH4 ebullition, driven by a verh high CH4 concentration in the deep soil (layer 8 and 9). What could be the possible reason causing this issue?
-1) Uninitilized variables? 
+Now we have an issue related to the global scale simulation. I found the single site simulation works well but when simulate on a global scale the related single site produce a big negative value which is majorly caused by an abnormally high CH4 ebullition, driven by a verh high CH4 concentration in the deep soil (layer 8 and 9). What could be the possible reason causing this issue?  1) Uninitilized variables? 
 2) Shall check all the statements that global simulation differing from the single simulations.
 
 ========================== Tasks for the draft revision ==================================
-(1) One site is needed to be corrected through a new calibration.
+[X] (1) One site is needed to be corrected through a new calibration. I found the issue really is related to the balance check or ebullition of CH4 in the code. Shall revise this and get a smoother emission...
 [X] (2) Adding the output of all fluxes components, including production, oxidation, diffusion (can be calculated as a residue), ebullition and aerenchyma transport.
 We found the oxidation to be several orders too high in Florida! Any issues happenning there?
 We found the oxidation at water table contributed several orders higher oxidation than from other layers. Seems like somthing not correct, either the CH4, O2 concentration, or the oxidation potential. Currently we ignore the oxidation from the water table to correctify this issue.
+It seems like the emission to be doubled after ignoring the oxidation at the water table level. So seems like we have no choice but to accept the oxidation? Or actually the production we're using here is a bit too high?
+I need to recalibrate for all sites... Just one site may not satisfy our requirement.
+Seems like the results cannot be matched until the assimilation rate vmax also being calibrated. This is out of the scope of this study so I actually used a high vmax (80) for US-Myb and US-Tw1 sites while used a low vmax (45) for US-WPT site, as the observed GPP suggested (no GPP fpr US-WPT, 973 gC m-2 yr-1 for US-Myb and 1779 gC m-2 yr-1 for US-Tw1). We need to think much more detail about the assimilation of aquatic plants. Review is required for the further study of this module.
+[X] (3) Found an issue related to unsuccessfully writing the restart file. Now checking. Bugs are found relating to the C14 tracers, now fixed.
+[X] (4) Other three sites are all needed to be recalibrated. I see Mayberry wetland site to be good after the calibration. How about other two evaluation sites?
+    [X] As the first step, now working on adjusting parameters for US-Twt site. It seems like after reducing the oxidation amount at the boundary level of water table we may have a better chance to reduce the parameter controling the production of methane.
+    I did not pay attention to the detail of FFSQP. Now it would be very helpful for me to take a look at its algorithm... Well, this is with the lowest priority.
+    Checked FFSQP. Nothing helpful for the calibration effort...
+[X] (5) Revise the python notebook code to plot both water table depth and CH4 emission on the same figure. Also double check the calculation of Wilmott index. Shall do this first.
+(6) Check if the window size 20 is good enough for making figures? How to check?
+How to do it and why doing it matters?
+Okay, at least for right now we don't tell the reason. Not sure if we need to later.
+[X] (7) Need to get the original water table depth obs with positive values when making figures.
+[X] (8) Seems like we did not consider the outflux from ebullition. How shall we revise this? Check CLM or LPJ-WhyMe code for reference?
+Seems like both model directly adding the ebulllition flux as one of the outflux.
+Now we have revised this point, but another problem came out. Since the ebulllition is large but a sudden event comparing to other processes, how to smooth this flux?
+The current result seems to me good enough. But our model actually overestimate the emission from the coastal region, which is a bit anti-intuition to me. What kind of solution we may have to resolve this issue?
+[X] (9) Something has been double counted. Check the balance...
+I found bunch of issues about the balance in the model. Now it seems to be fixed. The diffusion term still needs more consideration.
+[X] (10) Smooth the ebullition flux? I found the timing of ebullition to be not correct when comparing to the timing of the observation. Shall think about why?
+We used US-Tw1 instead of US-Twt. But we found something not correct that prevent the US-Tw1 to produce a correct order of CH4 emission. Possible reasons could be 1) wrong climate forcing, 2) mismatch of biome type and/or 3) Wrong water table depth. Now we increased the methane production ratio. Shall check into more detail what the actual production look like for the CONUS?
+[X] (11) Check why the aerenchyma transport for the first year to be so low?
+Checked and fixed the problem related to the uninitialized anpp at the beginning of the simulation when restart.
+[X] (12) Shall bear in mind the calculation for dryland and wetland may not correct since we're not considering the fractional water. Shall think about updating the output with the wetland and dryland emission separately.
+(13) (Possibly future work.) We actually found the over estimation of the coastal CH4 emission for the CONUS. So my question is what mistakes we may have in the calculation? It seems like the coast region has too high negative diffusion for the dryland (which does not make sense) and too high ebullition for wetland (this point maybe is related to the drastic temperature response of the Q10.). The discussion of these issues are required.
 
-[X] (3) Found an issue related to unsuccessfully writing the restart file. Now checking.
+========================== Works for responding to reviewers ==================================
+Wetland definitions, then, often include three main components:
+1) Wetlands are distinguished by the presence of water, either at the surface or within the root zone.
+2) Wetlands often have unique soil conditions that differ from adjacent uplands.
+3) Wetlands support biota such as vegetation adapted to the wet conditions (hydropytes) and, conversely, are characterized by an ansence of flooding-intolerant biota.
+
+Three coastal wetland sites (US-Srr, US-EDN, US-StJ) have been tested and we found only the US-StJ (estuarine wetland) could respond correctly since both other sites (mixed salt marsh and ranch) locate at deeper water table regions.
+So I plan to use the US-StJ site results for the revision but I did revise the rch4:co2 from 0.6 to 0.3 in order to match the observation. I also need to re-run the case by putting 0.3 for the coastal wetland site.
+
+Cannot find paper discussing these sites, but I have found an abstract discussing the result of US-Srr site:
+http://adsabs.harvard.edu/abs/2016AGUFM.B13A0549S
+Abstarct discussing the result of US-StJ site:
+http://adsabs.harvard.edu/abs/2018AGUFM.B21L2505L
+
+Need to run another set of simulations to figure out the improvement on the estimations of the whole CONUS.
+
+IMPORTANT: I found some issues related to the calculation of methane emission from R and Python. I applied the same data and the same code but getting different results. This is quite strange and right now I'm following the python code since python results make more sense ... Need to think about why R code produce this strange results.
+Okay. I found the bug...
+
+Submitted the revised version. The new calculated results are stored in the jupyter notebook: 
+/data/jain1/c/sshu3/SBGC/data/CONUS_CH4/check_tot_coastal_fresh.ipynb
+The uploaded data are located in:
+/data/jain1/c/sshu3/SBGC/data/GBC_methane
+
+Pushed the github repo on Nov 4th.
+

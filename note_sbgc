@@ -280,3 +280,651 @@ I think we shall not show the active layer thickness or we can say it is already
 
 (4) What can I do to strengthen the uncertainty analysis? What kind of "base case" shall I use? How to borrow some ideas from Haroon's work?
 
+===========================================================
+More science?
+
+See the temperature correlation to the change of SOC stock.
+See the soil wetness against the change of SOC stock. See how the model tells the correlation.
+Examine the vertical transport. (Actually by examine the top and sub soil we have already done this.)
+
+If necessary to check per biome SOC stock change?
+
+Then the SOC turnover. Vertical transport is a much more important impact.
+Next, temperature and precipitation induced change of SOC turnover.
+What kind of differences comparing to the old estimation from McGuire paper.
+
+===========================================================
+Found that model does not trigger the diffusion at all. Now fixed but the model estimation becomes too high.
+
+However our diffusion rate applied is consistent to other studies? We shall use the calibrated parameter as it is.
+How's the model performance grouped by the different biome? I think I shall already checked this but did not finish it until now. Let me do this first!
+
+Want to see if we can elevate the max depth for cryoturbation? Will this be helpful?
+After changing the root distribution I found this not to be very helpful...
+
+Seems like we need to change decomposition rate? But if we change this parameter we would have to re-run 0D...
+Or maybe the organo-mineral interaction? Let me see...
+If change the organo-minearl interaction, we may see the change of tundra and boreal forest at the same time. But in this case we would like to only reduce the Carbon content estimation from boreal forest. Seems like to increase the decomposition rate of boreal forest is a better approach?
+
+Analysis:
+I checked NCSCD dataset and found the tundra soil C profile is deeper, which does confirm that root distribution is the major issue that causing too deep soil profile in boreal forest, not the soil diffusivity is.
+(1) When manipulating soil diffusivity and advect rate, we have less carbon in the deeper soil (below 1m), which does not match what NCSCD show (Tundra soil relative plain but deep soil profile, while boreal forest has much higher SOC stock at the top soil but no deeper SOC stock). This can be revised through shallowing the root distribution of Boreal forest instead of changing the parameters controling soil vertical movement.
+(2) Still too high SOC stock in between 30cm-70cm (6th and 7th layer) for boreal forest, thus ISAM shows very high SOC stock from boreal forest. Shall think about a method to resolve?
+Two ways we can help to improve:
+(a). Reduce the organo-mineral (O-M) interaction, thus may help decrease the high SOC stock in the subsoil. But as I hypothesized, the reduction of O-M interaction would also change the estimation of tundra profile, which we think to be nicely captured by our model. So I need to test if it can bring me more benifit than loss.
+(b). Increase the decomposition rate of broeal forest, which I applied for the GCP CH4 simulation. In this case, it will be sure that tundra SOC profile will remain unchanged, but after changing the decomposition rate the estimation of SOC stock over boreal forest region from ISAM-0D model may decrease a lot. So we have to re-run the ISAM-0D model, which I shall not expect it to be.
+(c). Other possible revision on the environmental factors may also helpful, especially the temperature modifier. I would like to double check what the code I have applied to conserve the total environmental constraint on the top 1m SOC stock.
+
+Need to check how ISAM matches the site observation.
+Seems like boreal forest is overestoimated.
+
+Shut down the organo-mineral interaction to see the impact... 
+Impact is large. Reduced from 400 PgC to 230 PgC.
+
+Reduce the diffusivity to see the impact
+Impact is also large but not as large as the depth modifier. About 50 PgC reduction. But this may largely impact the calculated SOC of subsoil.
+
+Modify the Q10 parameter
+The first time when I perform the simulation, I did see the increase of Q10 may reduce the SOC stock.
+To my surprise, later when I redo the experiment, I found the increase of Q10 would largely increase the total SOC stock...
+So at least right now the value Q10 = 1.8 is good enough...
+And the reason why two different responses are detected, I did not know yet. Since I changed the decomposition rate (I remembered that I have changed it back but not sure) before conducting this experiment, I shall test the model and figure out this issue. Is the response to the change of Q10 related to the decomposition rate??
+Okay, I believe there was something wrong with my previous calculation. By increasing the decomposition rate of humus (k_hum) from 0.012 to 0.025, the response of SOC stock to the change of Q10 does not shift at all. By using Q10 = 1.8 we get 235PgC SOC but the SOC stock becomes 287PgC if the applied Q10 value is modified to 2.5.
+
+Increase the base decomposition rate of boreal forest?
+As we already thought about, by increasing the decomposition rate we largely decrease the SOC stock. From 381 PgC to 235 PgC.
+
+There was some strange results observed when changing parameters for the regional estimation. I now shall look at the site results much more carefully.
+Now the issue is fixed as I redid all simulations again and recorded the actual change of SOC stock.
+
+==================================================================================================================================================================================================
+
+For given the sensitivity test we conducted, we now at least need to have the estimation of calibration sites matching what the observation suggested after all our revisions (now only modified the root distribution, shall include more modifications later when we do bunch of tests). Now shall test how different answer by using those sites!
+
+Found a big issue about using the inconsistent climate data between site simulation and regional model estimation. There has a more than 8 degree difference between both climate data. Also, since the estimated SOC stock by old climate data is much less than by the new climate data based on the results from site simulations, it seems that 1D model would become more sensitive to the temperature change than the original 0D model. Differences of the temperature is the major cause, but not sure if only the temperature for growing season, or non-growing season, or the annual mean temperature can best resolve this difference.
+
+Based on the output of year 1920, the old climate has much warmer annual mean temperature comparing to the new climate datasets, seems like higher temperature may increase the respiration much more than the benefit gain from the plant productivity. It maybe 1920 to be an anomalous high temperature year. Also, a better explanation could be a much colder winter and much warmer summer causing the model estimation to bifurcate from each other.
+
+Would be good to check the difference between these two climate forcings to validate my thought. Based on my impression the old climate data has a relatively lower temperature thus we can capture a much shallower active layer thickness than the new climate dataset. 
+Yes, the active layer thickness is much shallower in the old climate data case than the new climate data case. This may reduce a substantial amount of SOC.
+
+Will see the SOC stock results!
+
+Now I started redo the simulation on ISAM-1D with the changed root distribution for boreal forest, increased decomposition base rate for only boreal forest (5, 18, 20, 24) and other parameters maintaining the original values. See if we can have some different estimation of SOC stock.
+
+Seems like the old climate data increases the regional SOC estimation. Then why it can help improving the estimation for the site level simulations? What happened there... Let me see the regional case?
+
+Also, from where do I extract the NCSCD results for evaluating site simulation? I would like to check it.
+After checking UM's site distribution, I saw the sites are mostly distributed on the nothern-most region... So we shall use new climate data for the site level evaluation and our work adjustment...
+
+Also, when shall we be able to check the calibration sites? I shall also double check the calibration site at the same time... 
+Anyway, the first priority shall be examining the response of the model in the transient case!
+
+Check if ISAM-0D and ISAM-1D shares the same or different annual NPP ...
+
+After switching to another set of climate data, this does not help to match the NCSCD datasets. I am wondering what else is happening that causing such a large difference between the site-level simulation of SOC and the regional simulation of SOC... Also, the site-level simulations are estimating too small the SOC stock.
+
+Several reasons which could cause the difference of SOC estimation between regional simulation and site-level ones.
+1. Check if the spatial pattern of the regional model simulation matches what we expected. (Yes. We expect the model to simulate SOC close to 25 kgC/m2 for the whole region, and the boreal forest SOC stock shall be much smaller comparing to the tundra biome. It seems to be good.)
+2. Check if the extracted NCSCD data points matches the regional NCSCD products we used? (Evaluation shows a mismatch between them... Kind of strange. But the mean of ncscd dataset not showing any large difference between the extracted site observation and the regional observation. At least for now it is not necessary to extarct the observation again.) 
+3. Check if the regional simulation of ISAM matches the site-level ISAM simulation? (Yes. Small SOC stock from site model simulation comparing to the regional simulation. This is the major issue, and now the question becomes why?)
+3a. Check if the climate data being used in both cases match each other? 
+One quick way to look at is to just pick one point and see. Here I picked the 1 site (lat[314]=67.25 degrees_north, lon[125]=62.75 degrees_east
+Tair_site = 268.704414754371 K
+Tair_region = =268.704414754 K
+So we confirmed that climate forcings for both cases are exactly the same!
+3b. Check if the model has difference when performing regional simulation comparing to the single site simulation? (Now this is the issue. But what kind of differences causing this?)
+We found some issues about the treatment of diffusivity in two version of models... What strange thing happened?
+
+First, we need to check if replacing the PFT fracrtion with the specified values can align the estimation from the regional model. I doubt this may help...
+I found some differences but not much in the estimated total SOC. So something else (bugs?) related to ISAM causing the divergent of the results.
+
+Second, see if any other output from the regional and site level simulation are showing the same results? For example, we should examine the litter input, soil respiration, environmental controls, etc...
+
+Okay. We found some differences on the calculated ALD, which would impact the calculated diffusive rate and hence the SOC profile... Not sure if the diffusive rate is the dominant issue so I decided to cancel the relationship between ald and diffusive rate then see any impact on the site level simulation? Then I want to figure out the reason ald is not showing the same results when shifting from global to site level.
+
+Seems like not a dominant issue. Shall pause right now and examine later. Now I'm really wondering if the root distribution and carbon uptake are divergent in two cases... 
+Litters are very different... Seems like we have trouble running model to produce even a reasonable carbon uptake... 
+Does it caused by the bugs related to the 5-stages settings? Or does it relate to nitrogen cycle?
+We may think about running model to examine the two cases...
+Let's run two cases, 1 site specific and another regional (but force model writing the output of that specific point) to evaluate the model reliability.
+
+First, case 1:
+Found a strange issue. When writing atmospheric forcing out and store as a site-level forcing then read it in again, we found the longwave radiation, uwind and vwind to be inconsistent to the original atmospheric forcing. Sounds very strange to me. My guess is that when storing the data into single file we skipped the longwave radiation but we use the code in ISAM to derive the longwave radiation instead. Same thing happened to the uwind and vwind.
+Yes, we have wrongly put CO2 value as LW when extarcting the global CRU_NCEP dataset. The code need to be modified to avoid the mismatch issues.
+
+Second, case 2:
+We do run the model for 20 years bgp and then store the bgp_to_bgc file to force case2.
+We use the case 2 bgp_to_bgc output from regional version to force the single site case.
+1) For case2, I found the regional simulation not simulating the vertical diffusion correctly. And I found the output of ald to be zero. The major issue now is that regional simulation seems not reading the ald correctly.
+It looks to me strange that the code is exactly the same but Cheyenne (which perform the regional runs) only has an old version of cpp which preprocess the code wrongly today... Not sure if this will happen any other time... I replaced cpp -tranditional by fpp in the buildopts.mk and see if the newer fpp can help.
+FPP works very well on cheyenne. Let me further check if this has fixed the issue in case 2. 
+2) Still have some differences of SOC profile. Let me see which variable is causing this difference...
+Diffusive rate is different. But it seems to be an error that we do not coordinate the model version on Cori to the version on Cheyenne. After fixing that we saw the same diffusive rate.
+3) Still have some substantial difference after 1000 year run. What is the issue here now?
+Some diff of base decomposition rate for biome 20 and 24. Now fixed.
+Okay, now it seems like case 2 to be the same for both site-level and regional simulations.
+
+Third, case 3:
+Slight difference. My guess is the N limitation feedback to the aboveground has issue.
+Yes, we confirmed that the N limitation to be different for these two cases. We possibly can fix this issue if we can have some function to truncate the precision of the N limitation.
+I got an idea about fixing this.
+
+Seems like N limitation is not the only issue when I do two experiments with both fna setting to 1.0.
+Okay, vmax again becomes the issue. But last time we found the issue of vamx due to the mismatch of N limitation. So this time maybe N limitation still has issue? Let's test what will happen if remove the fna in the calculation of vmax?
+Confirmed. Not the N limitation issue.
+So we shall deal with this issue later. Maybe more complex than I thought.
+
+In summary, we have accomplished fixing most of the mismatch issue between the single point case and the regional simulation case. More hidden issues about the model fidelity shall be fixed in the future.
+
+Fourth, the difference between the spinup using coupled version and the spinup strategy using 5-stages strategy:
+This need to be examined later. But I can see after fixing several issues in the model if the SOC stock from site simulation is improved...
+Shall be good, I guess...
+Still not good enough. Found the N limitation to be completely different if start model spinup with case3 runtype0 comparing to 5 stages strategy.
+I now can run the model with a reasonable N limitation (N_max_pt2) estimation first and then perform the calculation without any adjustment when performing the site level calculation. I guess this would be the best strategy for now at least...
+The existing regional file does not have a n_max_pt record. So we shall run the case1 and case2 to obtain the n_max_pt for those sites.
+
+When preparing the simulation to obtain the site level n_max_pt results, we found the site level restart file for bgp_to_bgc case is necessary otherwise a single site will produce 57 GB restart file and all for 200 site will be 11.4TB. 
+Now we have added the bgp_to_bgc spinup file for site level simulation. Meantime I would like to test using site 2.
+
+Done the new version with 3 stages spinup. But one thing I noticed is that the C14 profile will be an issue if not initialized appropriately. 
+So here our strategy is to clear the 14C signal by assigning all C14 zero here.
+Another possible strategy is to clear the 14C and also SOC then get the steady state through spinup.
+Seems like this strategy is going to work. Now we should do this type of spinup for site level simulation...
+It would be better to write the 5 year mean of the n_max_pt rather than for only one year's n_max_pt...
+Shit. I have already done this but I wasted my time to redo it...
+
+Now the site simulations are re-running.
+
+==========================================================================================================
+
+Next is to explain the isam0d, isam1d SOC sink and their difference.
+Run isam_1d again for evaluating if under steady state?
+The sink strength of SOC is determined by SOC dynamics. Incomplete description of SOC dyanmics, e,g, the simplified SOC model which does not include a vertically resolved modeling strategy, may ignore the impact of organo-mineral interaction, root litter input into deeper soil and the impact of layer-dependent environmental modifier on changing the sink strength. These dynamics can be refelcted by their impact on SOC turnover time. SOC pools with shorter turnover time tends to rapidly release back the received carbon input into the atmosphere, thus shows a faster response to the change of the atmospheric CO2 concentration and usually has a smaller pool size. To the opposite, SOC pools with longer turnover time indicates a much slower response to the changing environment but usually holds the most SOC. Hence, to capture the SOC response to the environmental change, it is necessary for model to improve the representation of SOC turnover time. For the permafrost region, the passive pool is the major portion of SOC.
+
+SOC stock for the 1m is increased from 285.2 PgC to 290.2 PgC, 5 PgC in total.
+By incoporating the vertically resolved version of ISAM model, we increased both the SOC stock and the turnover time. How am I going to explain and evaluate their impact on the SOC turnover time?
+
+Several processes causing the new addition of SOC into the soil column.
+First is the decomposition slowed down by the vertical transport and the consequentially depth protection from decomposition. Under the CO2 fertillization, the top soil layer received higher amount of the litter input and such a process increased the SOC sink due to 
+Second is the vertical distribution of the root will also produce root litter input that directly enter the deeper soil that being protected immediately.
+He et al. (2016) suggested a reduction of carbon sink through recalibrate the transfer coefficient from labile pools to resistant pools. In our simulation, the transfer coefficient between different SOC pools are not re-calibrated and our historical simulation results show increase of the decomposition of labile pool and the amount transferred into the resistant pools, thus we did not see the increase of the decomposition bigger than the protection through the above mentioned process.
+We show an increase of the SOC stock comparing to the 0-D approach.
+
+isam_0d need to be examined again from case3 since we changed the parameters...
+
+===========================================================================================================
+
+I did not do a simulation with the full coverage of 45N yet. Shall do this soon.
+
+Now completed. But I have not got time for analysis. Shall start now.
+
+===========================================================================================================
+
+I found another issue about the site simulation. The site 43 (Donalley Flat Creek) seems to be a little bit different from it used to be. I would like to examine the reason.
+After reducing the diffusive rate, this problem has been resolved at least for now.
+Bunch of other bugs are detected doing regional simulations:
+1. The perched water table calculated by running bgp only case may generate NaN value in the restart file. This would be required to fix.
+A: Seems like the initialization was not correct. Now fixed.
+2. When running case 1 for 1D model with C14 switching to ture, we found floating invalid for the vegc14 in autoresp_module.f90. Probably also due to the missing value. Need to check.
+A: Fixed. When running case 1 (BGP only) we did not set the atmospheric c14/c12 ratio correctly.
+3. When running case 1 for 1D model, bgp_to_bgc restart files are not stored successfully.
+A: Problem is related to the uninitialized surface water flux (runoff). For gridcell with partial coverage of glacier we may get NaN value.
+
+===========================================================================================================
+
+Another issue related to site vs. regional spinup...
+For the case 4 of regional simulation, what I did may lead to a reduction of the estimation of N_max_pt. Would be good to maintain N_max_pt in case 4 simualtion. This may increase the SOC a bit...
+Would be good to see the impact... 
+I found the case 4 not able to simulate N uptake after my revision. Need to check what actually happened...
+Or maybe I shall look at the N_max_pt output for a single site to make sure the model is running as my expectation.
+It seems like this issue does not imapct a lot the calculation.
+
+===========================================================================================================
+
+We have updated the new parameters now. Shall be the final version of parameter sets used in this study.
+We need to re-run the Umakant's 197 sites since the diffusivity has been changed to a awkaward condition. I may have to correct this error right now.
+Need to analyze the permafrost coverage from the bigger regional simulation results.
+
+===========================================================================================================
+
+Updated the calculation of turnover time. Last time the code did not consider the 30cm of the 8th layer.
+I shall put the all the calibration site results as python code.
+
+===========================================================================================================
+
+Sensitivity results show the turnover time when changing z_maxcryo will both have a positive impact. This was caused by: 1. when decreases z_maxcryo more SOC is accumulated in subsoil layer, hence the weighted SOC D14C is more impacted by deeper layer. 2, when increases z_maxcryo more SOC were transferred into deeper layer and this part will be remaining in the soil section below 1m layer. The section above 1m will only have small difference. Need to think about if this result makes sense?  
+
+===========================================================================================================
+
+Numbers:
+0D Model estimation of current SOC stock for 1m: 182.64 PgC
+1D Model estimation of current SOC stock for 1m: 359.31 PgC
+NCSCD estimation of SOC stock for 1m: 474.92 PgC.
+NCSCD estimation of SOC stock without peatland (histosol + histel): 356.52 PgC
+Here histosol is 69.1 PgC and histel is 49.3 PgC based on the Hugulius paper Table 2.
+Here we tried using the NCSCD histosol and histel fraction to estimate the amount but it did not reproduce the number showing in the paper. So here I directly borrow the number from this paper.
+
+Comparison against McGuire et al. (2016) paper:
+For Dave's paper he used another mask which contains a bigger boreal area.
+ISAM-1D SOC stock 1960:
+496.33
+ISAM-1D SOC stock 2009:
+487.23
+The total sink calculated from ISAM-1D model is 9.1 PgC.
+
+(1) How could we attribute the sink from different processes?
+1) First check the change of the NPP in the 2 different cases.
+Over the Dave's region ISAM-1D has a higher NPP comparing to ISAM-0D calculated based on NetCDF file (5.76 PgC for ISAM-1D comparing to 5.68 for ISAM-0D), although for the whole area above 20 degN ISAM-1D has a very close NPP to ISAM-0D based on both the dat file and NC file, interesting (18.41 PgC for 1901 and 23.67 PgC for 2010).
+Over Dave's region, Total NPP for both cases are 7.19. 
+
+ISAM-0D SOC stock 1960:
+284.37
+ISAM-0D SOC stock 2009:
+288.38
+The total sink calculated from ISAM-0D model is 4.0 PgC.
+
+(2) One finding I may need more effort to resolve is the decrease of subsoil SOC but increase of topsoil SOC. This completely reversed my expectation, but the mechanisms below must be sheded by examine other output... Need to do some examination to explain the reason and make some figures if necessary.
+
+First examine the change of NEP (NPP-Rh) and how it has impacted the SOC sink.
+NEP from ISAM-1D model is higher comparing to ISAM-0D. This makes sense that soil respiration does not increase due to the higher Turnover time.
+
+Then see if any corresponding correlation to the air temperature and been shifted.
+Change of air temperature vs. change of NEP?
+Under the same change of air temperature and the same change of CO2, the overall ISAM-1D shows a higher NEP comparing to ISAM-0D, suggesting that the ISAM-1D has a higher carbon sequestration ability. Higher increase of the SOC is the net impact from the 1D model changing the carbon cycle feedbacks. For adding the 1D processes and increased the turnover time, a weaker overall response induced reduced the concentration-carbon
+
+Discuss how each process has impacted the feedback parameters.
+Need to borrow what He's paper saying.
+
+Need to be carefully describe the two regions.
+
+Okay. Now basically ended the writing tasks. Shall double check and replot the figures and then the paper text tonight.
+
+===========================================================================================================
+
+I faced a problem of adjusting the 14C signal... Since when run model from case 4 to case 5, we want to keep the adjusted overall D14C but the relative fraction of different pools are already changed. Hence how can we adjust the D14C in this case??? Shall think about another alternative way?
+
+Okay. Math tells that if we adjust the ratio then do average, the result is different from if we first do average then adjust the ratio. 
+No, a simple example of math tells me this to be the same... Now kind of confused what happened there.
+Validated through the real data. Now pretty sure the averaged ratio is conserved. Now I really have to see what happened inside the code of the worksheet.
+Okay, diagnosed one triky bug that I missed the completed variable name... Hope now this calculation can make sense.
+
+Checked the calculation of the ratio and the ratio calculated from the 12C and 14C updated by the ratio from case 4 restart file. All show very small differences but some grids in the deeper soil have completely different results which do not make sense right now. Probably due to divide by 0 error.
+
+Now start checking the next step that writing the calculated values inside the new restart file.
+
+Evaluation of D14C algorithm suggests that it was correct. Now I have to double check the output D14C from the model...
+
+Comparison against the absolute change of temperature between 2000s and 1860s does not make sense to explain the change of SOC stock over no climate case. I would like to examine the mean change rate of temperature every year/decade to make the explanation stronger.
+Okay, I found the problem to be related to the snow coverage. WHenever there has snow cover there has lower temperature comparing to the one without snow coverage. So should plot the snow free temperature.
+
+===========================================================================================================
+
+How to deal with the low Rh from the 1D model when having higher temperature?
+1) change (increase) the Q10 sensitivity?
+2) change (increase) the decomposition rate?
+3) change (decrease) the depth modifier impact?
+
+Now I changed several differnt Q10 value, but none of them are giving me a satisfied response. I'm now really concern on the vertical resolved sturcture itself reduced the temperature sensitivity.
+
+By comparing 0D model to 1D model, I clearly see two difference: 
+1) Rh is more sensitive to temperature in 0D than in 1D. Seems like this cannot be explained simply by the Q10 applied in our model. First check if temperature profile is the major cause for this issue? Second, shall we go back to use the temperature sensitivity that 0D model applied? 
+2) NPP is higher in 1D case, which I guess to be related to the N dynamics. Shall check into more detail. Have to figure out a way...
+
+Now first thing is to check respiration profile. Which layer is contributing most of the respiration.
+The aggregated 1-m ST from 1D model is a little bit warmer than 0D model.
+
+Second is to check the temperature sensitivity and test its sensitivity.
+After I plotting the figure, I found the temperature sensitivity to be almost the same if setting q10=2.8.
+
+Now both temperature and ST sensitivity to be the same for 0D and 1D, why 1D cannot show the climate effect?
+
+
+Two possiblility: 1) Nitrogen, 2) Vertical transport too much thus increases C and this impact overlapped T sensitivity.
+
+[IMPORTANT] The problem is with Nitrogen??
+My 0-D experiment has turned on the N distrubance for background simulation.
+Oh, yeah. My 1-D experiment has turned off the N disturbance for background simulation... It to be better turning it on since the noco2 case also turned the N disturbance on... Will this be the problem??? Should test once see some simple output from the no-trans case.
+Okay, we see some obvious changes happen when turning off N disturbance for the no co2 case. So we shall keep N disturbance for all three cases when performing simulation.
+
+[IMPORTANT] Need to double check how the performance of 0D model using the ST instead of AT??
+I saw that using ST to replace AT would reduce half of the temperature response. I think it is mostly due to the smaller variability of ST comparing to AT. Hence the same thing will happen to the 1D model.
+
+The evaluation of model estimated NPP against SRDB does not show a good match. Think about checking the environmental conditions first.
+Temperature and precipitation are the first.
+
+From SRDB, Mean (± 1 s.d.) annual RS was 109 ± 109, 383 ± 228,745 ± 421, 813 ± 436, 776 ± 380, and 1286 ± 633 g C mfor unmanipulated Arctic, boreal, temperate, Mediterranean, subtropical, and tropical ecosystems respectively. The tropical data are near-normally distributed, while boreal and temperate data are not (Fig. 4); this reflects the zero-bound of annual RS (it is not normally negative) in ecosystems limited by low temperatures. Three variables – mean annual temperature, precipitation, and leaf area index, when combined in a simple linear regression analysis – explain ∼41% of the observed variability in annual RS, in line with previous meta-analyses of these drivers (Raich and Schlesinger, 1992; Reichstein et al., 2003).
+Two measures of variability (fields 40–41 in Table 1) are defined in the SRDB: interannual variability (the standard deviation of a series of annual RS values, all measured at one place) and error of the annual flux (typically plot-to-plot error, i.e., the standard deviation of a group of concurrently-measured values); few studies report both (Kabwe et al., 2005). 
+
+
+More materials I obtained suggest:
+1) Boreal forest has low (0.4) NPP to GPP ratio comparing to the temperate forest which usually has above 0.5 (https://www.researchgate.net/figure/The-GPP-and-R-a-patterns-with-forest-age-in-boreal-A-and-temperate-B-forests-The_fig1_262813365). Also the NPP to GPP ratio will decrease when the tree getting older.
+2) MODIS NPP product (https://climatedataguide.ucar.edu/climate-data/modis-gppnpp-project-mod17) suggests to have a higher NPP estimation comparing to ISAM estimation. But it also cannot reach to the high values as SRDB suggested.
+3) Our model seems to have low response to the change of light availability. Any method we can use to check? 
+I have tested replacing the model parameterization using jmax instead. The outcome seems not to be able to capture this large sensitivity.
+4) What about phenology? LAI change over season and it's sensitivity to the environmental factor change is also not represented well for boreal forest. How to check this also?
+5) What about the allocation factor that being linked to the variability of environmental factors?
+
+[IMPORTANT] Now need to figure out the problem related to the ST.
+It seems like tundra region has this wierd response. Boreal forest seems to be okay. 
+Double checked, after turning off the moss insulation the tundra response did not change.
+
+Checked snow class, no help.
+Checked if problem is with the climate data. I replaced the boreal forest site using the tundra climate. See if this is the cause.
+Yes, this helps.
+How about no change of other except biome? I changed the biome from tundra to boreal, see if this will help?
+Hmm, biome does not help. So the problem is related to the location... What could be the case? Let me see if the precipitation has some strange pattern...
+It might be helpful to check the seasonality of the ST for boreal and tundra cases separately.
+
+Okay, I found the winter surface temperature (ST) to be cooler but AT to be warmer in year 1938 for tundra grid. This looks to me very strange. I shall check the ground heat flux in this case.
+at_1861_mean: 259.2350426739726
+at_1938_mean: 261.0667105589041
+st_1861_mean: 268.2305214520548
+st_1941_mean: 266.6547307041096
+
+Good, I found a very wierd difference of precipitation over tundra regions between 1861 (i.e., the same as 1901) and 1938. In 1938 the snow fall is much less comparing to 1901, thus a thicker snow pack is found in 1901 and insulate the soil temperature, hence the warmer temperature is calculated in 1901 comparing to 1938, although the air temperature for the two years are quite different. However, despite the change of the precipitation, it might be better to only check the soil temperature change for the summer since the summer temperature is the major determinant of Rh.
+
+So the summer ST response to AT is also affected by the precipitation... Whenever their has a sudden increase of the precipitation, the soil temperature will be much cooler than the normal temperature. Not sure if this sensitivity is valid being described in the model.
+Now the hypothesized process is that:
+During winter, the lower precipitation at 1938 accumulate less snow thus less insulation to protect the warm land surface and thus ST is much cooler.
+[IMPORTANT] During summer, the higher precipitation at 1938 or other years cool down ST when the AT increase more, thus even colder comparing to the 1860s values and less sensitive to the change of AT.
+
+To see how the impact of precipitation on the change of ST, two cases are submitted:
+[X] 1) Use CRU_JRA_v1 to test if the climate forcing from this dataset makes sense.
+Okay. CRU_JRA_v1 has a better precipitation response for tundra region comparing to CRU_NCEP_v8.
+Now the question is if our model now so sensitive to the change of soil moisture makes sense or not? It would be great if we can test how the added snow/hydrology processes would impact the response of ST following the change of AT.
+Since the CRU_NCEP did not simulate a good temperature response but the CRU_JRA did for the summer, I'm wondering what variable(s) caused this. I believe some difference regarding the snow cover has caused this issue.
+I found some bias of SW and LW radiation between these two datasets, especially the LW radiation. I would like to test how the radiations impact the calculated ST.
+
+[X] 2) Force the precipitation always repeating the 20-years data (1901-1920) and see if this can improve the ST change.
+Yes, this helps the model to capture a stronger response of ST to the change of AT.
+But from this experiment I also found that summer AT and ST seems not changing too much... what is the issue their? Is it really that over tundra region the summer temperature is actully cooling over this period?? That will be really astonishing to me.
+Okay, I found the summer air temperature really does not change much, but the overall trend is still positive towards a 0.5 degreeC increase over the tundra grid I picked. The change of the precipitation does improve ST response but still very wired since the soil temperature response is still too strong. 
+Is there anything else than precipitation happened? Okay, I see, the thawing of soil ice created extra soil moisture is the major reason for that!
+
+Hence we have an additional case to check if the bogged soil moisture is the cause of the weak response?
+[X] 3) Force the precipitation repeating 20-years data (1901-1920) and meantime largely increase the drainage rate (in namelist, dp_drain from 1 to 100)! 
+Drainage does not help... This is a little bit confusing now...
+Another quick test increasing draingae from 100 to 10000!
+No use... I shall think about it twice by checking the code first.
+Let me check the ground heat flux for summer first??
+Seems like the ground heat flux is just fine and we actually have a higher ground heat flux into the soil when the ST is low... This needs to be checked later but as a lower priority.
+
+[X] 4) Wonder if the perched water table scheme changed the whole story. How about commenting out all related to the perched water table and run one more time??
+It does not help a lot. Need to see the diff of mositure between CRU_NCEP and CRU_JRA.
+
+[X] 5) Applied the same experiment as Precipitation case, thus keep repeating the (1) SW only and (2) SW + LW separately for the tundra site over the whole simulation period.
+No change of the ST when repeating the SW only.
+Large change of the ST when repeating the SW+LW. Hence LW to be the major cause of the low ST. This makes sense that ST=f(AT,SWdown,LWdown,SW,Plant).
+Hence, thw low LWrad during the summer time is the major cause of a low ST comparing to AT.
+
+Conclusion:
+Precipitation determines the ST during winter since a thicker snow layer insulate energy and keep the ST higher than thinner snow layer.
+A drastic drop of LW after 1930 from the CRU_NCEP datasets is the major reason of a much colder ST under a warmer AT. This has been corrected in CRU_JRA datasets but we need to examine how this would impact the whole regional simulation. In addition, solar radiation and precipitation are also 2 other impact factors which would impact the ST.
+
+For the next step, two tasks need to be examined.
+[X] 1) How the changed rad during summer would impact the 1-m SoilT rather than ST (Surface temperature).
+Mean soil temperature has relatively lower change comparing to AT. And this may not be able to describe how the resp response to change of SoilT.
+
+[X] 2) How is the temporal and vertical distribution of Rh? How we can check the Rh weighted SoilT rather than normal 1-m SoilT?
+Shall plot the rh temporal distribution first.
+The temporal distribution of rh is also mostly from summer.
+Vertically, most of the rh is coming from the topsoil.
+
+Also, we would like to think about using CRU_JRA instead of CRU_NCEP dataset for our simulation due to the biased LW down.
+I think the LWdown is very important to fix this issue.
+
+[FUTURE WORK] A good strategy to analyze is to first check the input and then check if any model issues causing this divergence. How can I compile these code and design a simple diagnosis tools based on Python for ISAM model output to accelerate the efficiency?
+
+[IMPORTANT] Next step is going to think about how to expand the sensitivity of Rh to the ST... This need to be done and to match the response of AT. What about checking other model's implementation?
+Here summurize the findings we can get from other model's equations:
+
+There has a request to change the temperature sensitivity in order to match the Rh. I'm looking for a valid method to do this...
+It would be good to have a biome-specific, or regional specific Q10 parameters as Davidson and Janssens (2006) suggested. They pinpointed the Q10 parameters to be reduced when the temperature goes much higher. Right now we examine a simpler method that considering the Q10 parameters as biome-specific, but later it would be good to test if a Q10 parameters being linked to the soil temperature is a good idea or not.
+Would be good to use a seasonal Rh for temperature sensitivity calibration.
+Collect several sites for 4 biomes to calibrate the Q10 separately: 1) boreal evergreen, 2) boreal deciduous, 3) tundra and 4) grassland.
+Calibrations are basically done, but adjustment of rh for some sites are required.
+
+[IMPORTANT] Decomposition rate really change few (double the rate only increase less than 20%) on the Rh. This makes sense since the decomposition rate of Humified soil is only a small portion of Rh.
+Reducing the Ra and attribute more outflux to Rh is another way. Based on this:
+
+Parameters changed for:
+
+Boreal Evergreen
+site 2534:
+
+k: 1.68e-07
+k_l: 9.00e-07
+k_r: 2.68e-06
+vmax = 60
+q10 = 1.6
+
+site 2396:
+
+k: 1.68e-07
+k_l: 9.00e-07 -> 7.00e-07
+k_r: 2.68e-06 -> 1.68e-06
+vmax = 60 -> 75
+q10 = 2.8
+
+site 4604:
+
+k: 1.68e-07 -> 1.00e-07
+k_l: 7.00e-07 -> 5.00e-07
+k_r: 1.68e-06 -> 1.28e-06
+vmax = 75 -> 85
+q10 = 2.8
+
+site 4166:
+
+k: 1.68e-07
+k_l: 7.00e-07
+k_r: 1.68e-06
+vmax = 85 -> 75
+q10 = 2.8
+
+# This site is not applicable since the phase is not correct.
+#site 5305:
+#k: 1.68e-07
+#k_l: 7.00e-07
+#k_r: 1.68e-06
+#vmax = 85 -> 75
+#q10 = 2.8
+
+Boreal Deciduous
+site 1382:
+
+k: 2.68e-07 -> 1.68e-07
+k_l: 2.68e-06 -> 1.68e-06
+k_r: 2.68e-06 -> 1.68e-06
+q10 = 2.8
+vmax = 65 -> 70
+
+Grassland:
+site 4214:
+
+k: No Change
+k_l: No Change
+k_r: No Change
+q10 = 1.6
+vmax = 65
+
+Tundra:
+site 5391:
+
+(This tundra site is not able to capture, need to check detailed reason why...)
+k: 1.27e-07
+k_l: 6.70e-06 -> 2.27e-07
+k_r: 7.27e-06 -> 3.27e-07
+q10 = 2.8
+vmax = 75
+
+Shrubland:
+site 7198:
+
+k: 1.77e-07 -> 3.5e-07
+k_l: 3.87e-07 -> 9.0e-07
+k_r: 4.27e-07 -> 1.0e-06
+q10 = 2.0
+vmax = 65 -> 45
+
+
+=======================================================================
+
+Okay. Now I have a side task to examine the N limitation on NPP and beloground decomposition for 0D and 1D model separately.
+Based on the NPP change from both 0D and 1D, I right now don't think 1D would change the N limitation drastically.
+Do N limitation differences between these two cases for the SOC decomposition? Only N limitation for the aboveground has been changed. N limitation for the belowground has no variation.
+
+When submitting jobs, I found the partitions a and b not able to run the isam executable since they only accept the jobs with older compiler.
+
+=======================================================================
+
+Regional simulation:
+1) I need to test the new SoilT results by replacing the atmospheric forcing with CRU_JRA.
+Two things are needed for checking, (1) the change of LW down from the CRU_JRA dataset over each decade and (2) the spatial distribution of the change of SoilT after replacing the datasets with CRU_JRA.
+
+After calibrating the GPP and NPP seems like litter fall is too high. It would be better to check the litter fall from the observation.
+
+The SOC calculated is still too high... Need to pick sites to examine why...
+All sites are showing a low NPP/Rh but correct SOC, hence we need to think about the decomposition rate to be underestimated.
+Not sure how we can adjust the recomposition rate of different model pools, one thing I would like to check later is how sensitive the final SOC stock to the decomposition rate of each pool.
+I now based on my personal experience to adjust the decomposition parameter. If both SRDB and NCSCD to be trustful, then ISAM decomposition is definitely underestimated.
+My only concern right now is how I can match the observed D14C profile. I would estimate the final turnover time would be less than ISAM estimation.
+Need to examine the site results immediately. First for all 5 calibration sites.
+Yeah, the thing I worried just happen. C14 is too young in the case where I have reduced the decomposition rate. Another set of better parameters may focus on increasing the decomposition rate of the fast pools, not the passive pools...
+How to adjust? Since these pools are not defined by their composition, it will be almost impossible to calibrate them based on observed SOC pools. Anyway, based on the SRDB showing and the D14C profile suggesting, I shall already realize that the decomposition of our fast pools shall be adjusted instead of passive pools... Let me examine it's sensitivity.
+
+I'm now looking at how increasing the decomposition rate would increase/decrease SOC and also change the TT.
+What I have noticed are that changing the rate of fast pools are more effective on modifying the SOC turnover time. But this modification should only be applied to the permafrost region.
+(1) Change the decomposition rate of slow pool would leads to a younger and faster TT soil.
+(2) Change the decomposition rate of fast pool would not change the SOC stock at all.
+(3) Real help is from modifying the microbial efficiency. Smaller efficiency would consume more carbon and release into the atmosphere.
+(4) Reducing the fraction of litter being stabilized can also help to redice the SOC stock (while not changing the TT? I guess so but need to test.)
+Now it seems like changing ebson(4) to be a best choice for adjusting the SOC since it controls the flux into the belowground.
+
+It seems like to reduce these microbial efficiency parameters would cause the model case4 to converge slower, especially tundra biome. Right now not sure what causes this...
+
+Calibration for boreal sites are basically done. But need to re-evaluate the Rh from those boreal sites.
+2 things I would like to finish this afternoon:
+[X] 1) I need to derive the math from these model equations. This should be done at the beginning...
+[X] 2) I need to arrange the code on Cori to re-evaluate the soil respiration sites using the new site level data.
+[X] 3) Check the soil respiration for those respiration sites. If possible adjust them through changing the NPP again.
+[X] 4) Adjust the parameters for the tundra. (site 110)
+
+Will be better to examine fo2 also?
+
+Next is to finalize the global simulation, site simulations and replace them with new figures.
+Need to be careful about checking the soil temperature.
+1) Write the description about using SRDB to adjust the model estimated respiration and the prepare the scatter plot of evaluation results.
+2) Perform simulations and produce new figures:
+   a) Fig 3, site calibration
+   b) Fig 
+3) Explain the impact on SOC from different environmental control factors? Maybe better to refer some other papers?
+
+Something new has to be done. Examine how our incoporated processes and updated processes change the CO2 fertilization effect and climate effect over a longer term...
+[X] 1) Do the historical simulation with updated parameters.
+[X] I noticed that the CO2 fertilization effect is too high for tundra and grassland. What actually causes this?
+First, need to examine the response of GPP and NPP to CO2 fertilization.
+It seems like there's no large differences of GPP/NPP to CO2 fertilization response between grassland/pasture and boreal/others.
+Second, test the sensitivity of each microbial efficacy parameters on controling the CO2 fertilization effect.
+ebson(4) and ebsstr_hum to be the most sensitivie parameter thus can decrease the SOC sequestration ability in the model.
+This makes sense since both are parameters actually will constrain the amount of SOC into the stabilized pools.
+
+[X] Next is to increase which parameter will not change the CO2 sequestration ability but to keep the calculation of SOC stock...
+ebson(1), not sensitive.
+ebson(3), shows some impact. 
+ebson(4), has big impact.
+ebsonstr_hum, has some impact
+
+[X] Now the question is how to adjust it?
+pick 276, 320 to test the CO2 fertilization.
+The results from this site simulation is not consistent to what I have seen from the regional model output...
+Let me extract the value from the regional NC output and check
+
+Regional value from 1861 to 2015: 
+CTRL case: 18.98 -> 18.79
+CO2 case: 18.97 -> 20.33
+
+Site level simulation was not consistent to the results comparing to regional simulation.
+INITIAL FILE shows: AGCBOX = 1.791, BGCBOX = 26.08, so Total = 27.871, consistent to the site level results.
+Maybe the wetland soil spoiled the results??
+Check the code and see no wetland soil being double counted...
+I need to check the results by printing the output for that specific site.
+Yes, from the txt output it looks just fine. Why the regional Netcdf cannot give the correct output??
+Okay, I see the regional output considered the bareground fraction thus the results will be modified by accounting the bareground fraction. But now why the CO2 fertilization effect is not correct in both cases?
+I believe there has something different between single site case and the regional case, but how we should do to fix it?
+
+Seems like some unexpected changes on the namelist changed the simulation results... Need to check!
+start_year? [NO]
+c14_disturb & c14_start_year? [NO]
+mosslayer? [YES]
+The sudden change of moss layer can cause a different response of the regional simulation.
+So here the site level simulation we want to perform should no use another mosslayer setting.
+
+OKAY. These two problems are resolved. Now we can apply the site level simulation to check the global response.
+The site simulation results still showing less CO2 fertilization effect comparing to the regional simulation.
+Remeber, regional simulation results have considered the weight of bareground. But this fraction does not change with time.
+site level: 27.68539 (ctrl) -> 28.09842 (co2)
+region level: 18.79 (ctrl) -> 20.33 (co2)
+
+Now I'm really concern about if some PFT fraction has been changed when running regional simulation??
+Interesting, the CO2 fertilized cases for single site and regional do not produce the same results. What causes this?
+How may I check the cause?
+Shit. I have used the wrong CLIMATE...
+But now after replacing the correct climate we still cannot get the same climate...
+Shit, I have run the site level case with a wrong start year (1860) instead of 1861.
+Now the Climate matches between site level and regional level simulation.
+Let's see the results. I expect this time to be a better outcome than we got last time.
+
+
+[X] Also, the total SOC calculated from the python code is not correct. Need to think about it twice why?
+Okay, very strange that now the code seems to be okay to reproduce the SOC stock. Maybe I have not run the python script correctly? Now it is from 360 PgC dropped to 310 PgC.
+Need to increase the SOC stock by some amount.
+
+[X] Also need to think about adjusting GPP using Rahul's code suggested by Atul. Especially the tundra site
+Adjsut the GPP and NPP based on Rahul's collected Fluxnet site data. Since each site only run several hundred years, it would be simple for me to run. Need to adjust the GPP first and then work on the regional simulation.
+
+
+2) Perform simulations under future scenarios.
+
+[X] Another strange thing is that only the SOC stock of site 146 seems to be overestimated by adjusting to a higher NPP/Rh, other boreal sites (143, 197, 43) all show a very large decrease of the SOC stock. More stranger is that in those three sites the NPP actually decreased a lot.
+Need to check this first!
+Is it caused by the climate? How come the climate has so huge impact??
+Something strange happened...
+Climate data causing such a large deviation. This is out of my expectation at least for now. Why?
+
+JRA: Slightly higher LW down, much lower SW down..., warmer air temperature (about 2 degree), and much higher day-to-day variability comparing to CRU_NCEP.
+CRU_NCEP_v8: Less day-to-day variability is found.
+
+Since JRA has such a small SW down radiation, no doubt the GPP will only be half of what we get from CRU_NCEP_v8.
+How about the spatial distribution of such a large difference? Let me check it and see...
+Why the diff from LW seems larger than SW?? It really confused me right now...
+Problem is with JRA. The JRA SW down is too small (99) compare to the actual climate forcing (110~120)
+What caused this difference?
+The site level CRU_NCEP and global level CRU_NCEP are consistent. But for CRU_JRA they are not consistent. Need to think about why?
+Okay, I'm wondering something related to the setting is not correct!
+Shit, I picked the wrong grids ... Now I fixed this issue.
+
+Need to re-run the 5 calibration sites to double check the new results.
+
+The eddy covariance method measures the net ecosystem exchange. However, particularly for CO2 exchange a lot more understanding of the ecosystem is gained, when the net flux is partitioned into the main components: gross carbon uptake (GPP) and ecosystem respiration (Reco).
+
+Currently, there are two alternative methods implemented:
+
+Reichstein 2005: Respiration is estimated from night-time and exptrapolated to daytime
+Lasslaop 2010: Respiration is estimated from fitting the Light-Response Curve (NEE ~ Radiation)
+
+Okay, I have adjusted the vmax and jmax for most of the biomes if available.
+Now need to double check the respiration dataset.
+Now I see the boreal evergreen SOC is too low, boreal deciduous SOC is too high.
+[IMPORTANT] Also, to the southern part of the region there has spodosol which high SOC is maintained by the leaching of DOC downward and in current model we did not consider this function yet. Hence, the model performance shall be poor in that region and the estimated SOC content is low.
+
+Okay, going to asses the NPP.
+NPP data is collected fromSRDB datasets and all data from aggrading plots are removed, i.e., we only assess the mature plant NPP. The removal is done mannually by hand. Then the data is processed through python code to compare with the model estimation.
+Seems like NPP still does not match what my expectation. Shall find a way to adjust.
+Any method I can find some more sites for grass, shrub and tundra???
+
+Model performance evaluation is done. Need to check site-level SOC and D14C now!
+Perform the sensitivity runs for all 5 sites.
+The regional SOC shows 319 PgC against 356 PgC from NCSCD, which is acceptable. But more important thing is after excluding spodosol we shall reduce the SOC amount from NCSCD and get a better match to regional SOC from ISAM-1D.
+

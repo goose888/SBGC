@@ -1,0 +1,92 @@
+#!/bin/bash
+
+ncks -d time,0,0 fw_new.nc frac_2009_1.nc
+ncks -d time,1,1 fw_new.nc frac_2009_2.nc
+ncks -d time,2,2 fw_new.nc frac_2009_3.nc
+ncks -d time,3,3 fw_new.nc frac_2009_4.nc
+ncks -d time,4,4 fw_new.nc frac_2009_5.nc
+ncks -d time,5,5 fw_new.nc frac_2009_6.nc
+ncks -d time,6,6 fw_new.nc frac_2009_7.nc
+ncks -d time,7,7 fw_new.nc frac_2009_8.nc
+ncks -d time,8,8 fw_new.nc frac_2009_9.nc
+ncks -d time,9,9 fw_new.nc frac_2009_10.nc
+ncks -d time,10,10 fw_new.nc frac_2009_11.nc
+ncks -d time,11,11 fw_new.nc frac_2009_12.nc
+
+ncks -d time,12,12 fw_new.nc frac_2010_1.nc
+ncks -d time,13,13 fw_new.nc frac_2010_2.nc
+ncks -d time,14,14 fw_new.nc frac_2010_3.nc
+ncks -d time,15,15 fw_new.nc frac_2010_4.nc
+ncks -d time,16,16 fw_new.nc frac_2010_5.nc
+ncks -d time,17,17 fw_new.nc frac_2010_6.nc
+ncks -d time,18,18 fw_new.nc frac_2010_7.nc
+ncks -d time,19,19 fw_new.nc frac_2010_8.nc
+ncks -d time,20,20 fw_new.nc frac_2010_9.nc
+ncks -d time,21,21 fw_new.nc frac_2010_10.nc
+ncks -d time,22,22 fw_new.nc frac_2010_11.nc
+ncks -d time,23,23 fw_new.nc frac_2010_12.nc
+
+ncks -d time,24,24 fw_new.nc frac_2011_1.nc
+ncks -d time,25,25 fw_new.nc frac_2011_2.nc
+ncks -d time,26,26 fw_new.nc frac_2011_3.nc
+ncks -d time,27,27 fw_new.nc frac_2011_4.nc
+ncks -d time,28,28 fw_new.nc frac_2011_5.nc
+ncks -d time,29,29 fw_new.nc frac_2011_6.nc
+ncks -d time,30,30 fw_new.nc frac_2011_7.nc
+ncks -d time,31,31 fw_new.nc frac_2011_8.nc
+ncks -d time,32,32 fw_new.nc frac_2011_9.nc
+ncks -d time,33,33 fw_new.nc frac_2011_10.nc
+ncks -d time,34,34 fw_new.nc frac_2011_11.nc
+ncks -d time,35,35 fw_new.nc frac_2011_12.nc
+
+ncks -d time,36,36 fw_new.nc frac_2012_1.nc
+ncks -d time,37,37 fw_new.nc frac_2012_2.nc
+ncks -d time,38,38 fw_new.nc frac_2012_3.nc
+ncks -d time,39,39 fw_new.nc frac_2012_4.nc
+ncks -d time,40,40 fw_new.nc frac_2012_5.nc
+ncks -d time,41,41 fw_new.nc frac_2012_6.nc
+ncks -d time,42,42 fw_new.nc frac_2012_7.nc
+ncks -d time,43,43 fw_new.nc frac_2012_8.nc
+ncks -d time,44,44 fw_new.nc frac_2012_9.nc
+ncks -d time,45,45 fw_new.nc frac_2012_10.nc
+ncks -d time,46,46 fw_new.nc frac_2012_11.nc
+ncks -d time,47,47 fw_new.nc frac_2012_12.nc
+
+ncks -d time,48,48 fw_new.nc frac_2013_1.nc
+ncks -d time,49,49 fw_new.nc frac_2013_2.nc
+ncks -d time,50,50 fw_new.nc frac_2013_3.nc
+ncks -d time,51,51 fw_new.nc frac_2013_4.nc
+ncks -d time,52,52 fw_new.nc frac_2013_5.nc
+ncks -d time,53,53 fw_new.nc frac_2013_6.nc
+ncks -d time,54,54 fw_new.nc frac_2013_7.nc
+ncks -d time,55,55 fw_new.nc frac_2013_8.nc
+ncks -d time,56,56 fw_new.nc frac_2013_9.nc
+ncks -d time,57,57 fw_new.nc frac_2013_10.nc
+ncks -d time,58,58 fw_new.nc frac_2013_11.nc
+ncks -d time,59,59 fw_new.nc frac_2013_12.nc
+
+ncks -d time,60,60 fw_new.nc frac_2014_1.nc
+ncks -d time,61,61 fw_new.nc frac_2014_2.nc
+ncks -d time,62,62 fw_new.nc frac_2014_3.nc
+ncks -d time,63,63 fw_new.nc frac_2014_4.nc
+ncks -d time,64,64 fw_new.nc frac_2014_5.nc
+ncks -d time,65,65 fw_new.nc frac_2014_6.nc
+ncks -d time,66,66 fw_new.nc frac_2014_7.nc
+ncks -d time,67,67 fw_new.nc frac_2014_8.nc
+ncks -d time,68,68 fw_new.nc frac_2014_9.nc
+ncks -d time,69,69 fw_new.nc frac_2014_10.nc
+ncks -d time,70,70 fw_new.nc frac_2014_11.nc
+ncks -d time,71,71 fw_new.nc frac_2014_12.nc
+
+ncks -d time,72,72 fw_new.nc frac_2015_1.nc
+ncks -d time,73,73 fw_new.nc frac_2015_2.nc
+ncks -d time,74,74 fw_new.nc frac_2015_3.nc
+ncks -d time,75,75 fw_new.nc frac_2015_4.nc
+ncks -d time,76,76 fw_new.nc frac_2015_5.nc
+ncks -d time,77,77 fw_new.nc frac_2015_6.nc
+ncks -d time,78,78 fw_new.nc frac_2015_7.nc
+ncks -d time,79,79 fw_new.nc frac_2015_8.nc
+ncks -d time,80,80 fw_new.nc frac_2015_9.nc
+ncks -d time,81,81 fw_new.nc frac_2015_10.nc
+ncks -d time,82,82 fw_new.nc frac_2015_11.nc
+ncks -d time,83,83 fw_new.nc frac_2015_12.nc

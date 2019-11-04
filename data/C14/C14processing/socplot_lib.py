@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Wed Nov 14 02:00:52 2018
+* Last Modified : Wed Jul  3 00:56:58 2019
 
 * Created By : Shijie Shu
 
@@ -47,6 +47,102 @@ def plot_soilprof(socprof, Y, tit, path):
     status = plt.close("all")
 
     return status
+
+def plot_obsvsmod_plain(fig, figpos, obs, Yobs, mod, Ymod, xticks=None, hide_xticks=False, yticks=None, hide_yticks=False, xlim=None, ylim=None, sub=' ', fontsize_ax=20, fontsize_lg=30, legendps='upper left'):
+    """ Make plot for a single D14C profile with both observation and modeled
+    outputs
+    This updated version included more settings on axes and title 
+    Input:
+        fig --- Handler of the figure
+        figpos --- Three digits position of the subplot
+        obs --- Observed SOC profile (kgC m-3)
+        Yobs --- Corresponding soil depth for observation (cm)
+        mod --- Modeled SOC profile (kgC m-3)
+        Ymod --- Corresponding soil depth for model (cm)
+        xticks --- The ticks for x axis (if set) 
+        hide_xticks --- Not showing ticks for x axis (if set) 
+        yticks --- The ticks for y axis (if set), default is to 100cm
+        hide_yticks --- Not showing ticks for y axis (if set) 
+        xlim --- Lim of x axis (if set) 
+        ylim --- Lim of y axis (if set), default is to 102cm
+        sub --- subplot title
+        fontsize_ax --- Font size of the axis
+        fontsize_lg --- Font size of the legend
+        legendps --- Position of the legend
+    Output:
+        status --- Return value if the figure is closed successfully
+    """
+
+    ax = fig.add_subplot(figpos)
+    #ax = fig.axes[0]
+    if xlim is not None:
+        plt.xlim((xlim[0], xlim[1]))
+    else:
+        plt.xlim((-2, 102))
+    if ylim is not None:
+        plt.ylim((ylim[0], ylim[1]))
+    else:
+        plt.ylim((-5, 105))
+    # ax1 = ax.twiny()
+    # Define resources, will be added later
+    #axfont = {'family' : 'normal',
+    #          'weight' : 'bold',
+    #          'size'   : 22}
+    #matplotlib.rc('font', **font)
+    # Y = np.arange(1,len(socprof))     # 1cm to 200cm
+    # total SOC
+    h1 = ax.plot(obs.astype(float),Yobs.astype(float),marker='o',color='g',linewidth=2.2)
+    h2 = ax.plot(mod.astype(float),Ymod.astype(float),color='b',linewidth=2.2)
+    ax.grid(color='gray', which='major', axis='both', alpha=0.3)
+    if(figpos % 10 == 1):
+        ax.legend(['Observation', 'Modeled'], loc=legendps, fontsize=fontsize_lg)
+    # Set Xticks
+    if xticks is not None:
+        ax.set_xticks(xticks, minor=False)
+    else:
+        start, end = ax.get_xlim()
+        ax.xaxis.set_ticks(np.arange(start, end,(end-start)/6))
+    # Set Yticks
+    if yticks is not None:
+        ax.set_yticks(yticks, minor=False)
+    else:
+        yticks = (0, 50, 100, 150)
+    plt.gca().invert_yaxis()
+
+    # Set font size
+    for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+             ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontsize(24)
+    # ax.xaxis.label.set_fontsize(fontsize_ax)
+    # ax.yaxis.label.set_fontsize(fontsize_ax)
+    # ax.get_xticklabels().set_fontsize(fontsize_ax)
+    # ax.get_yticklabels().set_fontsize(fontsize_ax)
+    if hide_xticks:
+        plt.setp(ax.get_xticklabels(), visible=False)
+        #ax.get_xaxis().set_visible(False)
+    if hide_yticks:
+        plt.setp(ax.get_yticklabels(), visible=False)
+        #ax.get_yaxis().set_visible(False)
+
+    # Set tick formats
+    plt.minorticks_on()
+    ax.tick_params(axis="x", which="both", top=True)
+    ax.tick_params(axis="y", which="both", right=True)
+    ax.tick_params(axis="both", which="both", direction="in", pad=10)
+    ax.tick_params(axis="both", which="major", length=8, width=2)
+    ax.tick_params(axis="both", which="minor", length=3, width=1)
+
+    # Add the subplot title
+    if (xlim is not None and ylim is not None):
+        plt.text(xlim[0]+0.12*(xlim[1]-xlim[0]), ylim[0]+0.1*(ylim[1]-ylim[0]), sub, fontsize=28)
+    else:
+        plt.text(-2+0.1*(102+2), -5+0.1*(105+5), sub, fontsize=28)
+
+    for tl in ax.get_xticklabels():
+        tl.set_color('k')
+    fig.tight_layout() # Or equivalently,  "plt.tight_layout()"
+
+    return 0
 
 def plot_obsvsmod(obs, Yobs, mod, Ymod, tit, path=None, mod2=None, Ymod2=None, xticks=None, yticks=None, xlim=None, ylim=None, fontsize_ax=24, fontsize_lg=30, legendps='upper left'):
     """ Make plot for a single D14C profile with both observation and modeled

@@ -2,11 +2,11 @@
 
 * File Name : isamcalc_lib.py
 
-* Purpose : Lib for processing ISAM output
+* Purpose : Lib for calculations related to ISAM or ISAM output
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Tue Oct 23 17:47:33 2018
+* Last Modified : Tue Sep 24 05:36:35 2019
 
 * Created By : Shijie Shu
 
@@ -82,8 +82,8 @@ def mean_by_depth(nlev, zsoih, nprof, profile):
             if(zsoih[j] >= 2.0):
                 val[i, j] = val[i, j-1]
             else:
-                ub = np.floor(zsoih[j] * 100.0)
-                lb = np.floor(zsoih[j+1] * 100.0)
+                ub = np.int(np.floor(zsoih[j] * 100.0))
+                lb = np.int(np.floor(zsoih[j+1] * 100.0))
                 val[i, j] = np.nanmean(profile[i, ub:lb])
                 # if(np.isnan(val[i, j])):
                 #     val[i, j] = val[i, j-1]
@@ -111,8 +111,8 @@ def mean_by_depth_sep8(nlev, zsoih, nprof, profile):
             if(zsoih[j] >= 2.0):
                 val[i, j] = val[i, j-1]
             else:
-                ub = np.floor(zsoih[j] * 100.0)
-                lb = np.floor(zsoih[j+1] * 100.0)
+                ub = np.int(np.floor(zsoih[j] * 100.0))
+                lb = np.int(np.floor(zsoih[j+1] * 100.0))
                 val[i, j] = np.nanmean(profile[i, ub:lb])
                 # if(np.isnan(val[i, j])):
                 #     val[i, j] = val[i, j-1]
@@ -120,8 +120,8 @@ def mean_by_depth_sep8(nlev, zsoih, nprof, profile):
                 #     val[i, j] = val[i, j-1]
             # Only consider the mean of the SOC density above 1m for level 8
             if(j == 7):
-                ub = np.floor(zsoih[j] * 100.0)
-                lb = np.floor(1 * 100.0)
+                ub = np.int(np.floor(zsoih[j] * 100.0))
+                lb = np.int(np.floor(1 * 100.0))
                 val[i, j] = np.nanmean(profile[i, ub:lb])
     return val
 
@@ -129,8 +129,8 @@ def latlon_2_idx(lat, lon):
 
     """ Get the mean value of a profile by averaging the values within each layer defined in ISAM model
     Input:
-        lat --- latitude
-        lon --- longitude
+        lat --- latitude (-90 ~ 90)
+        lon --- longitude (-180 ~ 180)
     Output:
         loc --- lat and lon index used by ISAM
     """
@@ -139,10 +139,43 @@ def latlon_2_idx(lat, lon):
     if (lon>=0):
         lonid = int(round(lon * 2 + 0.5))
     else:
-        lonid = int(360 + round((360 + lon) * 2 + 0.5))
+        lonid = int(360 + round((180 + lon) * 2 + 0.5))
     loc = [latid, lonid]
 
     return loc
+
+def agg_1m_soil(prof):
+    """ Aggregate the value of the 1m soil (0-100cm) by adding the first 7 layers and 30% of the 8th 
+        layer of ISAM soil output
+    Input:
+        prof --- soil profile (needs at least 8 layers)
+    Output:
+        val --- scalar
+    """
+
+    val = np.sum(prof[0:7]) + 0.3*prof[7]
+
+    return val
+
+def avg_wt_1m_soil(weight, prof):
+
+    """ Get the mean value of the 1m soil (0-100cm) by averaging the first 7 layers and 30% of the 8th
+        layer of ISAM soil output using the predefined weight
+    Input:
+        weight --- the values used as weight. No need to standardize before calling this subroutine
+                   but the length must be consistent to the prof
+        prof --- soil profile (needs at least 5 layers)
+    Output:
+        val --- scalar
+    """
+
+    weight_tot = np.sum(weight[0:7]) + 0.3*weight[7]
+    wt = np.zeros((8))
+    wt[0:7] = weight[0:7] / weight_tot
+    wt[7] = 0.3*weight[7] / weight_tot
+    val = np.nansum(wt*prof[0:8])
+
+    return val
 
 def agg_topsoil(prof):
     """ Aggregate the value of the top soil (0-30cm) by adding the first 5 layer of ISAM soil output
@@ -162,6 +195,7 @@ def avg_wt_topsoil(weight, prof):
         using the predefined weight
     Input:
         weight --- the values used as weight. No need to standardize before calling this subroutine
+                   but the length must be consistent to the prof
         prof --- soil profile (needs at least 5 layers)
     Output:
         val --- scalar
@@ -169,7 +203,7 @@ def avg_wt_topsoil(weight, prof):
 
     weight_tot = np.sum(weight[0:5])
     wt = weight[0:5] / weight_tot
-    val = np.nanmean(wt*prof[0:5])
+    val = np.nansum(wt*prof[0:5])
 
     return val
 
@@ -192,6 +226,7 @@ def avg_wt_subsoil(weight, prof):
         using the predefined weight
     Input:
         weight --- the values used as weight. No need to standardize before calling this subroutine
+                   but the length must be consistent to the prof
         prof --- soil profile (needs at least 8 layers)
     Output:
         val --- scalar
@@ -204,7 +239,69 @@ def avg_wt_subsoil(weight, prof):
             wt[i] =  weight[(i+5)] / weight_tot
         else:
             wt[i] = 0.3*weight[(i+5)] / weight_tot
-    val = np.nanmean(wt*prof[5:8])
+    val = np.nansum(wt*prof[5:8])
 
     return val
+
+def q10_1dag(coef, temp):
+
+    """ Get the Aboveground Q10 temperature factor based on ISAM-1D calculation.
+    Input:
+        coef --- the Q10 coefficient
+        temp --- mean soil temperature
+    Output:
+        val --- scalar, q10 factor
+    """
+
+    val = 1.0 * coef**((temp-25.0)/10.0)
+
+    return val
+
+def q10_1dbg(coef, temp):
+
+    """ Get the Belowground Q10 temperature factor based on ISAM-1D calculation.
+    Input:
+        coef --- the Q10 coefficient
+        temp --- mean soil temperature
+    Output:
+        val --- scalar, q10 factor
+    """
+
+    val = 1.3 * coef**((temp-10.0)/10.0) - 1.3*2.0**(-2.0)
+
+    return val
+
+def tsen_0dag(temp):
+
+    """ Get the Aboveground Q10 temperature factor based on ISAM-1D calculation.
+    Input:
+        coef --- the Q10 coefficient
+        temp --- mean soil temperature
+    Output:
+        val --- scalar, q10 factor
+    """
+
+    tmod = 0.73
+    val = tmod*0.09*np.exp(0.095*temp)
+
+    return val
+
+def tsen_0dbg(temp):
+
+    """ Get the Belowground Q10 temperature factor based on ISAM-1D calculation.
+    Input:
+        coef --- the Q10 coefficient
+        temp --- mean soil temperature
+    Output:
+        val --- scalar, q10 factor
+    """
+
+    temp_in = temp
+    if(temp < -10.0):
+        temp_in = -10.0
+
+    val = (47.91 / (1.0 + np.exp(106.06/(temp_in+18.27))))
+
+    return val
+
 

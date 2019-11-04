@@ -1,0 +1,24 @@
+Contiguous United States (CONUS) Wetlands and Non-wetlands Soil Methane Emissions (Download)
+
+This folder conatains three NetCDF datasets:
+
+1. CH4_mean_2001_2010.nc, contains annual mean wetlands and non-wetlands methane fluxes for the CONUS region for 2001 - 2010, including variables (units: gCH4 m-2 year-1):
+Aerenchyma_nonwetland: Methane emission through aerenchyma transport for non-wetlands
+Aerenchyma_wetland: Methane emission through aerenchyma transport from wetlands
+Diffusion_nonwetland: Methane emission/sink through diffusion from non-wetlands
+Diffusion_wetland: Methane emission/sink through diffusion from wetlands
+Ebullition_nonwetland: Methane emission through ebullition from non-wetlands
+Ebullition_wetland: Methane emission through ebullition from wetlands
+Emission_nonwetland: Methane emission from non-wetlands
+Emission_wetland: Methane emission from wetlands
+Oxidation_nonwetland: Methane oxidation from non-wetlands
+Oxidation_wetland: Methane oxidation from wetlands
+Production_nonwetland: Methane production from non-wetlands
+Production_wetland: Methane production from wetlands
+Fractional_water: Fractional area of surface water
+
+2. CH4_mean_rcp45_2091_2100.nc, contains annual mean wetlands and non-wetlands methane fluxes for the CONUS region for 2091 - 2100 under RCP4.5 scenario, including the same variables as CH4_mean_2001_2010.nc.
+
+3. CH4_mean_rcp85_2091_2100.nc, contains annual mean wetlands and non-wetlands methane fluxes for the CONUS region for 2091 - 2100 under RCP8.5 scenario, including the same variables as CH4_mean_2001_2010.nc.
+
+Reader can use these data to reproduce the figures 3, 4 and 5 in the main text.

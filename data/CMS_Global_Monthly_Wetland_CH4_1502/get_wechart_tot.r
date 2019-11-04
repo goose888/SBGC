@@ -18,6 +18,19 @@ nlat <- 360
 res <- 0.5
 
 ## DO NOT EDIT BELOW
+# Get the grid area
+grid_area <- matrix(-9999., nrow=nlon, ncol=nlat)
+EARTH_AREA =  5.096e14;
+lat <- seq(-89.75, 89.75, 0.5)
+res = 0.5;
+
+for (i in 1:nlat) {
+  for (j in 1:nlon) {
+     grid_area[j,i] <- (EARTH_AREA/2)*abs(sin((lat[i] - res/2)*pi/180) -
+              sin((lat[i] + res/2)*pi/180))/(360/res)
+  }
+}
+
 # Open and read netcdf file
 nc <- open.nc(fmasknc, write=FALSE)
 # get the size of lat and lon
@@ -43,21 +56,10 @@ maskval[1:360,] = maskval[361:720,]
 maskval[361:720,] = temp[1:360,]
 
 # Mask out values outside the US
-ch4[maskval < 12]  <- NA
-ch4[maskval > 12]  <- NA
+#ch4[maskval < 12]  <- NA
+#ch4[maskval > 12]  <- NA
 
-# Get the grid area
-grid_area <- matrix(-9999., nrow=nlon, ncol=nlat)
-EARTH_AREA =  5.096e14;
-lat <- seq(-89.75, 89.75, 0.5)
-res = 0.5;
 
-for (i in 1:nlat) {
-  for (j in 1:nlon) {
-     grid_area[j,i] <- (EARTH_AREA/2)*abs(sin((lat[i] - res/2)*pi/180) -
-              sin((lat[i] + res/2)*pi/180))/(360/res)
-  }
-}
 ch4_m <- ch4*grid_area
 
 # Summarize the total number 
