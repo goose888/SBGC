@@ -44,8 +44,8 @@ depths(mishradata) <- Profile.ID ~ top + bottom   # Promote normal data.frame to
 mishradata$idcol <- mishradata$Profile.ID
 
 ## Fit MP spline by profile
-# try(m<-mpspline(mishradata, 'C_Density', lam = 0.1))
-try(m<-mpspline(mishradata, 'bulk_density', lam = 0.1))
+try(m<-mpspline(mishradata, 'C_Density', lam = 0.1))
+#try(m<-mpspline(mishradata, 'bulk_density', lam = 0.1))
 #try(m<-mpspline(mishradata, 'C_Density', lam = 0.5))
 #try(m<-mpspline(mishradata, 'Ccontent', lam = 0.1))
 
@@ -61,8 +61,8 @@ m$idcol_sorted <- m$idcol[order(m$idcol)]
 # Write out interpolated SOC profile
 # write.csv(m$fitted, file='SOCfitted.csv', na="", row.names = TRUE)
 # write.csv(m$interpolated, file='SOCprofile.csv', na="", row.names = TRUE)
-write.csv(m$fitted, file='BDfitted.csv', na="", row.names = TRUE)
-write.csv(m$interpolated, file='BDprofile.csv', na="", row.names = TRUE)
+# write.csv(m$fitted, file='BDfitted.csv', na="", row.names = TRUE)
+# write.csv(m$interpolated, file='BDprofile.csv', na="", row.names = TRUE)
 
 
 #DONE

@@ -46,23 +46,28 @@ ch4_ori <- var.get.nc(nc, ch4var)
 close.nc(nc)
 
 #ch4 <- ch4_ori[,,1]
-ch4 <- ch4_ori
+for(i in 1:18) {
+   ch4_tmp <- 365*ch4_ori[,,1:12,i]/12000.
+   ch4 <- matrix(0, nrow=nlon, ncol=nlat)
+   for (j in 1:12) {
+      ch4 <- ch4 + ch4_tmp[,,j]
+   }
 
-#ch4[ch4<0] <- 0
-#ch4[ch4>1000] <- 0
-
-temp = maskval[1:360,]
-maskval[1:360,] = maskval[361:720,]
-maskval[361:720,] = temp[1:360,]
-
-# Mask out values outside the US
-ch4[maskval < 12]  <- NA
-ch4[maskval > 12]  <- NA
-
-
-ch4_m <- ch4*grid_area
-
-# Summarize the total number 
-ch4_tot <- sum(colSums(ch4_m, na.rm = TRUE), na.rm = TRUE)/1e12
-
-print(ch4_tot)
+   #ch4[ch4<0] <- 0
+   #ch4[ch4>1000] <- 0
+   
+   temp = maskval[1:360,]
+   maskval[1:360,] = maskval[361:720,]
+   maskval[361:720,] = temp[1:360,]
+   
+   # Mask out values outside the US
+   ch4[maskval < 12]  <- NA
+   ch4[maskval > 12]  <- NA
+   
+   ch4_m <- ch4*grid_area
+   
+   # Summarize the total number 
+   ch4_tot <- sum(colSums(ch4_m, na.rm = TRUE), na.rm = TRUE)/1e12
+   
+   print(ch4_tot)
+}

@@ -6,11 +6,13 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Fri Jan 25 12:48:08 2019
+* Last Modified : Fri Nov 29 18:07:25 2019
 
 * Created By : Shijie Shu
 
 """
+
+# This package requires "isamcalc_lib" package, please make sure you obtain it from the author
 
 import pandas as pd
 import numpy as np
@@ -19,7 +21,7 @@ import isamcalc_lib as isam
 
 def get_value_SOC(idx, soc):
 
-    """ Get the uncertainty range of the topsoil (0-30cm) and subsoil (30-100cm) 
+    """ Get the topsoil (0-30cm) and subsoil (30-100cm) SOC
     Input:
         idx_u --- index of the line corresponds to the SOC profile simulated using high end parameter value
         idx_l --- index of the line corresponds to the SOC profile simulated using low end parameter value
@@ -37,6 +39,7 @@ def get_value_SOC(idx, soc):
 def get_sensitivity_range_SOC(idx_u, idx_l, soc):
 
     """ Get the uncertainty range of the topsoil (0-30cm) and subsoil (30-100cm) 
+        This is simply acheived by subtarcting the lower bounds by using upper bounds of all sensitivity simulations.
     Input:
         idx_u --- index of the line corresponds to the SOC profile simulated using high end parameter value
         idx_l --- index of the line corresponds to the SOC profile simulated using low end parameter value
@@ -57,7 +60,10 @@ def get_sensitivity_range_SOC(idx_u, idx_l, soc):
 
 def get_sensitivity_range_D14C(idx_u, idx_l, soc, d14c):
 
-    """ Get the uncertainty range of the topsoil (0-30cm) and subsoil (30-100cm) 
+    """ Get the D14C uncertainty range of the topsoil (0-30cm) and subsoil (30-100cm) 
+        This is simply acheived by subtarcting the lower bounds by using upper bounds of all sensitivity simulations.
+        Is it correct to use SOC as weight to directly scale D14C?
+        D14C is linearly transformed from 14C mass, so I believe this method is applicable.
     Input:
         idx_u --- index of the line corresponds to the SOC profile simulated using high end parameter value
         idx_l --- index of the line corresponds to the SOC profile simulated using low end parameter value

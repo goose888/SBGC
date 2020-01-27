@@ -1,4 +1,4 @@
-Bug:
+Bugs:
 (1) strange diffs between two same cases:
 diff in air temp, precip, lw down and specific q
 Okay, now adjusted the met files so both are using the same atm forcing
@@ -927,4 +927,62 @@ Any method I can find some more sites for grass, shrub and tundra???
 Model performance evaluation is done. Need to check site-level SOC and D14C now!
 Perform the sensitivity runs for all 5 sites.
 The regional SOC shows 319 PgC against 356 PgC from NCSCD, which is acceptable. But more important thing is after excluding spodosol we shall reduce the SOC amount from NCSCD and get a better match to regional SOC from ISAM-1D.
+
+After adjusting the model parameters I have to re-arrange the code and update all figures.
+Simulations done on Cori: 5 sites simulation, 197 sites evaluation, sensitivity test for the 5 calibration sites
+Simulations done on Cheyenne: Regional simulations- historical and future projection, evaluation of NPP and Rh for ISAM model
+Simulations done on Keeling: Evaluation of GPP for ISAM model
+
+Since we need to calculate the turnover time, and based on the performance right now Cori is the best for running python to get the TT for regional case.
+
+Several more modifications on the model: Light limitation for GPP, Updated parameters of microbial efficiency to match the Rh. And I have to recall some of these jobs done when working on the re-running the codes.
+
+Finished:
+(1) Compared the model codes on Cori and Cheyenne. I merged them into a good version that can reproduce the regional simulation. Now the July 15th version is for the ISAM-0D simulation and he current version is for the ISAM-1D simulation.
+(2) Transfer all regional output to keeling and examine the CO2 and Climate impact.
+Fixed issues: 1. The simulation for site 110 has issue. We now need to re-run and fix it.
+              2. Some bugs in the code isamcalc_lib.py are fixed.
+3.1 Sensitivity python code requires careful check.
+(7) Need to exclude the spodosol also.
+Found the USDA gobal soil suborder map (https://www.nrcs.usda.gov/wps/portal/nrcs/detail/soils/use/?cid=nrcs142p2_054013). Spodosol includes: 15-19
+Resample from 1/30 x 1/30 deg to 1/2 x 1/2 deg and using ArcMap to transfer into NetCDF.
+(3) Analyze the sensitivity results.
+3.2 Update the write-up about sensitivity analysis. Need to take refer from one paper.
+(5) Update results and write-ups.
+
+To do:
+(4) If possible, run ISAM-0D version of the model for the RCP8.5 future projection. (Optional)
+(6) Meantime I shall save those data for the further usage. (Optional)
+
+Issues found:
+3. Seems like increasing aa and bb both increases the SOC TT. This does not make sense for now so I shall examine the code.
+The reasons is that for aa high case for 110 site, we see the D14C after spinup is higher than control but becomes lower than control case after the first 20 years of historical run. Is this the correct response or a glitch? Since the value is small and only aa and bb cases have this issue, we now revised the figure, but cannot ignore this issue once done the detailed checking.
+4. Calibration of site 110 requires double check. I found a Q10 = 1.8 would be the best although the results right now is not bad. But I would say the mean Q10 at 2.8 is just too high.
+5. Calculation of the 0D STT seems to have some issue and we shall think about updating it at some point.
+
+For 1D: Need to explore the by-layer, by-each-pool respiration and input.
+For 0D: Explore by-each-pool respiration and input are enough.
+
+Several descriptions missing in the model:
+[X] 1) Compare ISAM estimated topsoil and subsoil against UM's 197 sites to show that NCSCD estimation of topsoil and subsoil are not an opimal results.
+[X] 2) Discuss the role of nitrogen in the current ISAM-1D model
+[X] 3) Discuss the role of oxygen limitation in the current ISAM-1D model.
+[X] 4) Explore the 0D model deficiency against 1D and how we're going to improve.
+
+Now the tough task is about how to match C14-based calculation of STT to the Pool-based calculation of STT.
+1) C14-based calculation is very sensitive to the young soil, I guess its precision on that is not good enough.
+BTW, why not compare with:
+(1) add the total C14 and C12, then get D14C for the whole region and calculate it?
+AND
+(2) first get the D14C for each gridcell, adding them through area-weighted average method?
+Ironically, these two methods also give difference. I now accept the first method since the assumption to average calculated STT from different gridcells seem to be not correct. 
+But it will be sure if we calculate the regional total C14 and C12, then transfer into D14C and calculate the STT.
+
+2) C14-based calculation should be area-weighted to gain the regional average value. This has not been done yet.
+3) Is it reasonable to use the Pool-based calculation of STT to replace the C14-based calculation of STT for the steady state? I saw He's paper showing those values which perfectly match the pool-based calculation of STT, but I doubt this to be the case.
+Now from the results of 0D I can summarize that C14-based calculation cannot provide a exactly balanced STT even for the steady-state. I now very suspicious about the numbers He et al., 2016 reported in her supplemental material. But anyway, we shall use the change based on the calculation of C14-based calculation.
+Also, the C14-based calculation has one issue that assuming the D14C from the input to be the same as atmospheric D14C level, but this may have issue for our calculation since litter fall has different D14C comparing to the atmosphere. Another disadvantage of C14-based approach for deriving the STT is that for pools with relatively young age, it is very sensitive to the D14C value, thus we cannot easily handle it and obtain a correct number in this case. But at least for transient case it is absolutely not correct to calculate STT using the pool-based method, which is still popular in a lot of model analysis studies.
+
+
+
 

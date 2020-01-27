@@ -272,3 +272,39 @@ The uploaded data are located in:
 
 Pushed the github repo on Nov 4th.
 
+Currently 2 stuffs are missing for backing-up the GBC methane paper work:
+1). Coastal site level simulations case folders are stored on Cades and it maybe purged. This I have to reproduce it some time.
+2). The code geenrate the future wetland extent under the threaten of SLR cannot be found. Since the method is pretty simple I am sure I can simply reproduce the code if necessary.
+
+========================= Second round revision =============================
+
+More sites are added but some of the sites do not contain enough forcings (climate and WTD)
+We right now copied the CRU_JRA_v1 2011 data for 2018 and 2013 data for 2019 to aid the sites if they are required.
+
+Site LA-1 may have trouble in meteorology data. Need to perform the simulation then check.
+
+Need to check if the unit of the FCH4 matches the Ameriflux description or not based on the description from the publication? 
+It seems like the site observations are correct, thus I would need to check the problem inside the model?
+It is not reasonable to get such a low simulation of FCH4, seems like something is not set correctly inside the model?
+First need to add the water table depth into each site.
+
+US-Ho1 site run failure. Not sure what happened but once after finishing the first cycle the site simulation will crash.
+The problem is related to the wrongly applied water table depth.
+
+CONUS mangrove is 251,293 ha. (Giri, et al., 2016)
+CONUS rice is 1,100,000 ha. (USGS report, Portmann et al., 2011 data)
+Wetland extent is 470,000 km2 => 47,000,000 ha. (NWD)
+
+===================================================================================
+About the reproducibility of the site simulations!
+
+Okay. Now we have made some changes on the calculation of site level methane. Most of the sites we shall use the specific vmax (source code in isam_ch4_paper and their corresponding vmax is listed in the source code) to get the simulation results. To run them, use namelist.cal for old sites or namelist.hist for new sites. To check the output, rename them as the python code requested. If several cycle simulations are performed, get the results of the cycle and then rename them.
+
+Specifically, US-DPW has undergone a change of phenology, which has a separate source code (isam_ch4_paper_usdpw).
+
+For US-Tw1 site, please use US-Tw1_mirror to perform the simulation. We used a different phenology for the 3rd year so the source code (isam_ch4_paper_ustw1 for the first 2 years, and ) and simulation namelists (namelist.cal for the first 2 years, and namelist.cal_3rdyear for the 3rd year) for first two years and the third year are different. After the simulation, coin the 3rd year results with the first 2 years then make the figure.
+
+Also, the python code to make the plots contain the adjustment of ebullition that postpond 2 years. basically, I simply shift the ebullition forward for 2 years. I know this is a very rudimentary  method for accounting the correct timing of ebullition, further works are required to adjust its timing through better parameterization.
+
+The python notebook code for old sites is in Fig3.ipynb, for new sites is in CH4_site_plot.ipynb.
+===================================================================================

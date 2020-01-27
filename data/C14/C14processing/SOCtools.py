@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Thu May 30 05:43:23 2019
+* Last Modified : Wed Dec 18 17:31:52 2019
 
 * Created By : Shijie Shu
 
@@ -87,6 +87,31 @@ def aggre_profden_to_stock_1m(zsoih, dz, profile):
         if(~np.isnan(profile[i, 7])):
             val[i] = val[i] + profile[i, 7] * (1-zsoih[7])
     return val
+
+def aggre_profden_to_stock_30cm(zsoih, dz, profile):
+
+    """ Aggregate the SOC density profile into a total stock value
+        till 1m specifically for ISAM output
+    Input:
+        zsoih --- depth of the interface of each soil layer, (nlev+1) * 1
+        dz --- depth of each soil layer (m), nlev*1
+        profile --- SOC profile in kgC/m3, nlev*nprof
+    Output:
+        val --- The aggregated SOC stock, 1*nprof
+    """
+
+    nprof = len(profile)
+    val = np.zeros(nprof)
+    for i in range(0, nprof):
+        val[i] = profile[i, 0]*dz[0]
+        for j in range(1, 5):
+            if(np.isnan(profile[i, j])):
+                break
+            else:
+                val[i] = val[i] + profile[i,j]*dz[j]
+    return val
+
+
 
 def aggre_prof_den_to_stock(depth, zsoih, dz, profile):
     """ Aggregate the SOC density profile into a total stock value till the preset 

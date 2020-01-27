@@ -6,7 +6,7 @@
 
 * Creation Date : 18-07-2017
 
-* Last Modified : Tue Sep 24 05:36:35 2019
+* Last Modified : Wed Dec 18 16:58:33 2019
 
 * Created By : Shijie Shu
 
@@ -94,7 +94,7 @@ def mean_by_depth(nlev, zsoih, nprof, profile):
 
 def mean_by_depth_sep8(nlev, zsoih, nprof, profile):
 
-    """ Get the mean value of a profile by averaging the values within each layer defined in ISAM model
+    """ Get the mean value of a profile (gC/m3) by averaging the values within each layer defined in ISAM model
     Input:
         nlev --- number of soil layers
         zsoih --- layer interface (m), (nlev+1)*1

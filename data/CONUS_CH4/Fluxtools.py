@@ -6,7 +6,7 @@
 
 * Creation Date : 23-03-2018
 
-* Last Modified : Tue Feb  5 01:30:06 2019
+* Last Modified : Mon Dec 23 07:31:48 2019
 
 * Created By : Shijie Shu
 
@@ -45,7 +45,7 @@ def mdv(srs, window=5, nstep=48):
 
     return srs_filled
 
-def hr2daily(srs, method="mean", nstep=48):
+def hr2daily(srs, method="avg", nstep=48):
 
     """ Transfer half hourly observation to daily mean or daily total
     Input:
